@@ -1,2 +1,2 @@
-# Pothole Detector 👷
+# Pothole Detector 👷 (Under Development)
 The Pothole Detector is an application designed to identify road potholes by assigning a unique identifier to each pothole, annotating them with coordinates based on their IP address, recording the timestamp of detection, and capturing photographs of each detected pothole. This program is implemented using Python, OpenCV, and YOLOv8.
