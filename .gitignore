@@ -1,3 +1,5 @@
 env
 __pycache__/
 cropped_photo
+data_rec.ipynb
+test2.mp4
