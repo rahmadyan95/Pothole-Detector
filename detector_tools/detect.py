@@ -3,13 +3,14 @@ import pandas as pd
 from ultralytics import YOLO
 from tracker import*
 import cvzone
-import curr_loc
+import curr_loc as curr_loc
 import os
 import datetime
+import detect
 
 def detect ():
 
-    model = YOLO('custom.pt')
+    model = YOLO('detector_tools/custom.pt')
     cap = cv2.VideoCapture('test2.mp4')
     #cap = cv2.imread('download.jpg')
 
@@ -119,12 +120,17 @@ def detect ():
             break
     
     print(data)
+
+    df = pd.DataFrame.from_dict(data, orient='index')
+    df.reset_index(inplace=True)
+    df.rename(columns={'index': 'id'}, inplace=True)
+    df.to_csv(f'{date}.csv', index=True)
+
     cap.release()
     cv2.destroyAllWindows()
-
-    return data
 
 
 
 if __name__ == '__main__':
     detect()
+    
