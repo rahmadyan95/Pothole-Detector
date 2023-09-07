@@ -8,14 +8,15 @@ import os
 import datetime
 import detect
 
+
 def detect ():
 
-    model = YOLO('detector_tools/custom.pt')
+    model = YOLO('custom.pt')
     cap = cv2.VideoCapture('test2.mp4')
     #cap = cv2.imread('download.jpg')
 
 
-    my_file = open("coco.txt", "r")
+    my_file = open('coco.txt', "r")
     data = my_file.read()
     class_list = data.split("\n") 
     #print(class_list)
