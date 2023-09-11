@@ -51,14 +51,6 @@ class StartPage(ctk.CTkFrame):
                         )
         title.pack(anchor=tk.NW, padx=40, pady=50)
 
-        title = tk.Label(self,
-                        text = "Powered By",
-                        font = font.Font(family="Norwester",size=14, weight="bold"),
-                        fg="white",
-                        bg="gray20"
-                        )
-        title.pack(anchor=tk.NW, padx=40, pady=50)
-
         #Detection Button
         detect_button = CTkButton(self, width=220, 
                           height=300, text='',
@@ -82,10 +74,6 @@ class StartPage(ctk.CTkFrame):
                                 )
         page3_button.pack(anchor=tk.NW, pady=20, padx=50, side=tk.LEFT)
 
-
-        
-
-    
 
 class Page1(ctk.CTkFrame):
     def __init__(self, parent, controller):
