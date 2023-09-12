@@ -29,6 +29,7 @@ def detect ():
 
     data, counter1 = {},[]
     coord_y_line1, offset = 290, 25
+    width, height = {},{}
 
     def crop_image (img):
         x = datetime.datetime.now()
