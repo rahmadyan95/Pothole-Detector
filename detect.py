@@ -72,6 +72,9 @@ def detect ():
             x2=int(row[2])
             y2=int(row[3])
             d=int(row[5])
+
+            width = round( (x2-x1) * 0.1949152542,2) #predict width
+            height = round((y2-y1) * 0.11392405,2)  # predict height 
             
             c=class_list[d]
             if 'pothole' in c:
@@ -87,6 +90,8 @@ def detect ():
 
             if coord_y_line1 < (cy + offset) and coord_y_line1 > (cy - offset) :
                 cv2.rectangle(frame,(x3,y3),(x4,y4),(0,255,0),2)
+                cv2.putText(frame, f'Width: {width}cm', (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+                cv2.putText(frame, f'Height: {height}cm,', (x1, y1 - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                 cvzone.putTextRect(frame,f'id: {id} {c}',(x3,y3),1,1)
                 if counter1.count(id) == 0 :
                         crop = frame[y3:y4,x3:x4]
@@ -97,7 +102,10 @@ def detect ():
                             'Longtitude' : long,
                             'Day'  : day,
                             'Date' : date,
-                            'Time' : hour
+                            'Time' : hour,
+                            'Width' : width,
+                            'height' : height
+                            
                         }
 
                         #backward_scan[id] = (cx,cy)
