@@ -52,12 +52,19 @@ class StartPage(ctk.CTkFrame):
         title.pack(anchor=tk.NW, padx=40, pady=50)
 
         #Detection Button
+
+        kamera_image = PhotoImage(file=r".\app_asset\kamera.png").subsample(3,3)
         detect_button = CTkButton(self, width=220, 
                           height=300, text='',
                           fg_color='grey', text_color='black',
-                          command=lambda: controller.show_frame(Page1)
+                          command=lambda: controller.show_frame(Page1),
+                          image= kamera_image,
+                          
+                          
                           )
         detect_button.pack(anchor=tk.NW, pady=20, padx=50, side=tk.LEFT)
+
+
 
         # Button untuk mengarahkan ke Page2
         page2_button = CTkButton(self, width=220,
@@ -86,8 +93,12 @@ class Page1(ctk.CTkFrame):
                                     )
         side_background.pack(side=tk.LEFT, fill=tk.Y)
 
-        label = ctk.CTkLabel(self, text="Ini adalah Page 1")
-        label.pack()
+        canvas = tk.Canvas(self, width=1100, height=900)
+        canvas.pack(anchor=tk.W, padx=10, pady=20)
+
+
+        # label = ctk.CTkLabel(self, text="Ini adalah Page 1")
+        # label.pack()
 
 class Page2(ctk.CTkFrame):
     def __init__(self, parent, controller):
@@ -99,6 +110,6 @@ class Page2(ctk.CTkFrame):
 if __name__ == "__main__":
     app = tkinterApp()
     app.title('Pothole Detector')
-    app.geometry('1100x600')
+    app.geometry('1050x600')
     app.mainloop()
 

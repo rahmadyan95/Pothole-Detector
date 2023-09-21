@@ -59,7 +59,7 @@ def detect ():
         count += 1
         if count % 3 != 0:
             continue
-        frame=cv2.resize(frame,(1020,500))
+        frame=cv2.resize(frame,(1020,600))
     
         results = model.predict(frame)
         a = results[0].boxes.data
@@ -74,8 +74,8 @@ def detect ():
             y2=int(row[3])
             d=int(row[5])
 
-            width = round( (x2-x1) * 0.1949152542,2) #predict width
-            height = round((y2-y1) * 0.11392405,2)  # predict height 
+            width = round( (x2-x1) * 0.1949152542,2) # predict width
+            height = round((y2-y1) * 0.11392405,2)   # predict height 
             
             c=class_list[d]
             if 'pothole' in c:
@@ -131,11 +131,17 @@ def detect ():
     
     print(data)
 
-    df = pd.DataFrame.from_dict(data, orient='index')
-    df.reset_index(inplace=True)
-    df.rename(columns={'index': 'id'}, inplace=True)
-    df.to_csv(f'{date}.csv', index=True)
+    print("mau simpan data")
+    if input() == 1 :
 
+        df = pd.DataFrame.from_dict(data, orient='index')
+        df.reset_index(inplace=True)
+        df.rename(columns={'index': 'id'}, inplace=True)
+        df.to_csv(f'{date}.csv', index=True)
+    
+    else :
+        pass
+    
     cap.release()
     cv2.destroyAllWindows()
 
