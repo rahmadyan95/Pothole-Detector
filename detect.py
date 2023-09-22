@@ -12,7 +12,7 @@ import detect
 def detect ():
 
     model = YOLO('custom.pt')
-    cap = cv2.VideoCapture('test2.mp4')
+    cap = cv2.VideoCapture("test2.mp4")
     #cap = cv2.imread('download.jpg')
 
 
@@ -131,17 +131,13 @@ def detect ():
     
     print(data)
 
-    print("mau simpan data")
-    if input() == 1 :
 
-        df = pd.DataFrame.from_dict(data, orient='index')
-        df.reset_index(inplace=True)
-        df.rename(columns={'index': 'id'}, inplace=True)
-        df.to_csv(f'{date}.csv', index=True)
+    df = pd.DataFrame.from_dict(data, orient='index')
+    df.reset_index(inplace=True)
+    df.rename(columns={'index': 'id'}, inplace=True)
+    df.to_csv(f'{date}.csv', index=True)
     
-    else :
-        pass
-    
+
     cap.release()
     cv2.destroyAllWindows()
 
