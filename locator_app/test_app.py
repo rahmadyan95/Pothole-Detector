@@ -24,16 +24,22 @@ class GPSApp(App):
         return self.box_layout
 
     def get_location(self, instance):
-        if instance == self.allow_button:
-            gps.configure(on_location=self.on_location)
-            gps.start()
-        elif instance == self.get_location_button:
-            gps.start()
+        try:
+            if instance == self.allow_button:
+                gps.configure(on_location=self.on_location)
+                gps.start()
+            elif instance == self.get_location_button:
+                gps.start()
+        except Exception as e:
+            print(f"Error: {e}")
 
     def on_location(self, **kwargs):
-        lat = kwargs.get('lat')
-        lon = kwargs.get('lon')
-        self.location_label.text = f'Latitude: {lat:.6f}\nLongitude: {lon:.6f}'
+        try:
+            lat = kwargs.get('lat')
+            lon = kwargs.get('lon')
+            self.location_label.text = f'Latitude: {lat:.6f}\nLongitude: {lon:.6f}'
+        except Exception as e:
+            print(f"Error: {e}")
 
 if __name__ == '__main__':
     GPSApp().run()
