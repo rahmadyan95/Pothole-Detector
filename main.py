@@ -94,7 +94,9 @@ class Page1(ctk.CTkFrame):
         side_background.pack(side=tk.LEFT, fill=tk.Y)
 
         canvas = tk.Canvas(self, width=1100, height=900)
-        canvas.pack(anchor=tk.W, padx=10, pady=20)
+        canvas.place(x=10,y=20)
+
+
 
 
         # label = ctk.CTkLabel(self, text="Ini adalah Page 1")
@@ -110,6 +112,6 @@ class Page2(ctk.CTkFrame):
 if __name__ == "__main__":
     app = tkinterApp()
     app.title('Pothole Detector')
-    app.geometry('1050x600')
+    app.geometry('1980x800')
     app.mainloop()
 
