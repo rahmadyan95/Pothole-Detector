@@ -4,6 +4,7 @@ import customtkinter as ctk
 from customtkinter import*
 from tkinter import*
 from tkinter import font
+from ttkbootstrap import *
 
 class tkinterApp(ctk.CTk):
     def __init__(self, *args, **kwargs):
@@ -17,7 +18,7 @@ class tkinterApp(ctk.CTk):
 
         self.frames = {}
 
-        for F in (StartPage, Page1, Page2):
+        for F in (StartPage, Page1, Page2, Page3):
             frame = F(container, self)
             self.frames[F] = frame
             frame.grid(row=0, column=0, sticky="nsew")
@@ -34,52 +35,85 @@ class StartPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         
-        custom_font = font.Font(family="Norwester",size=90, weight="bold")
+        custom_font = font.Font(family="Bahnschrift SemiBold SemiConden",size=100, weight="bold")
 
         side_background = CTkCanvas(self, width=150,
                                     height=1100, 
                                     bg="gray10",
-                                    highlightthickness=0
+                                    highlightthickness=0,
                                     )
         side_background.pack(side=tk.LEFT, fill=tk.Y)
 
-        title = tk.Label(self,
-                        text = "POTHOLE\n  DETECTOR",
-                        font = custom_font,
-                        fg="white",
-                        bg="gray20"
-                        )
-        title.pack(anchor=tk.NW, padx=40, pady=50)
+        title = tk.Label(self,text = "POTHOLE",font = custom_font,fg="white",bg="gray20")
+        title.place(x=200,y=50)
+
+        title1 = tk.Label(self,text = "AUTODETECTOR",font = custom_font,fg="white",bg="gray20")
+        title1.place(x=200,y=200)
 
         #Detection Button
 
         kamera_image = PhotoImage(file=r".\app_asset\kamera.png").subsample(3,3)
-        detect_button = CTkButton(self, width=220, 
-                          height=300, text='',
-                          fg_color='grey', text_color='black',
+        page1_button = CTkButton(self, width=500, 
+                          height=150, text='DETECT POTHOLE',
+                          fg_color='grey', text_color='grey10',
                           command=lambda: controller.show_frame(Page1),
-                          image= kamera_image,
+                          font=("Bahnschrift SemiBold SemiConden",45),
+                          hover_color="#fce101",image=kamera_image,
                           
                           
                           )
-        detect_button.pack(anchor=tk.NW, pady=20, padx=50, side=tk.LEFT)
+        page1_button.place(x=100,y=200)
+
+        page2 = CTkButton(self, width=240, 
+                          height=300, text='SHOW DATA',
+                          fg_color='grey', text_color='black',font=("Bahnschrift SemiBold SemiConden",18),
+                          command=lambda: controller.show_frame(Page2),
+                          textvariable=(20,10),
+                          hover_color="#fce101",
+                          
+                          )
+        page2.place(x=100,y=370)
+
+        page2 = CTkButton(self, width=240, 
+                          height=300, text='SHOW DATA',
+                          fg_color='grey', text_color='black',
+                          command=lambda: controller.show_frame(Page3),
+                          hover_color="#fce101",
+                          
+                          )
+        page2.place(x=360,y=370)
+
+
+        side_background = Canvas(self, width=1180, height= 940, background="grey", highlightthickness=0)
+        side_background.place(x=1300,y=400)
+
+        title_side = CTkLabel(self,text="SYSTEM INFORMATION", font=("Bahnschrift SemiBold SemiConden",18),text_color="white",bg_color="grey")
+        title_side.place(x=872, y=220)
+
+
+    
+
+        
+
+        
+
 
 
 
         # Button untuk mengarahkan ke Page2
-        page2_button = CTkButton(self, width=220,
-                                height=300, text='',
-                                fg_color='grey', text_color='black',
-                                command=lambda: controller.show_frame(Page2)
-                                )
-        page2_button.pack(anchor=tk.NW, pady=20, padx=0, side=tk.LEFT)
+        # page2_button = CTkButton(self, width=220,
+        #                         height=300, text='',
+        #                         fg_color='grey', text_color='black',
+        #                         command=lambda: controller.show_frame(Page2)
+        #                         )
+        # page2_button.pack(anchor=tk.NW, pady=20, padx=0, side=tk.LEFT)
 
-        page3_button = CTkButton(self, width=220,
-                                height=300, text='',
-                                fg_color='grey', text_color='black',
-                                command=lambda: controller.show_frame(Page2)
-                                )
-        page3_button.pack(anchor=tk.NW, pady=20, padx=50, side=tk.LEFT)
+        # page3_button = CTkButton(self, width=220,
+        #                         height=300, text='',
+        #                         fg_color='grey', text_color='black',
+        #                         command=lambda: controller.show_frame(Page2)
+        #                         )
+        # page3_button.pack(anchor=tk.NW, pady=20, padx=50, side=tk.LEFT)
 
 
 class Page1(ctk.CTkFrame):
@@ -93,8 +127,10 @@ class Page1(ctk.CTkFrame):
                                     )
         side_background.pack(side=tk.LEFT, fill=tk.Y)
 
-        canvas = tk.Canvas(self, width=1100, height=900)
-        canvas.place(x=10,y=20)
+        # canvas = tk.Canvas(self, width=1100, height=900)
+        # canvas.place(x=10,y=20)
+
+        
 
 
 
@@ -108,10 +144,19 @@ class Page2(ctk.CTkFrame):
         label = ctk.CTkLabel(self, text="Ini adalah Page 2")
         label.pack()
 
+class Page3(ctk.CTkFrame):
+    def __init__(self, parent, controller):
+        super().__init__(parent)
+        label = ctk.CTkLabel(self, text="Ini adalah Page 3")
+        label.pack()
+
 
 if __name__ == "__main__":
     app = tkinterApp()
     app.title('Pothole Detector')
-    app.geometry('1980x800')
+    app.geometry("1280x720")
+    app.resizable(False,False)
+    
+    
     app.mainloop()
 
