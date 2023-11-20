@@ -1,10 +1,10 @@
-import tkinter as tk
-from tkinter import ttk
+# import tkinter as tk
+# from tkinter import ttk
 import customtkinter as ctk
 from customtkinter import*
-from tkinter import*
+# from tkinter import*
 from tkinter import font
-from ttkbootstrap import *
+from ttkbootstrap import * 
 
 class tkinterApp(ctk.CTk):
     def __init__(self, *args, **kwargs):
@@ -37,12 +37,12 @@ class StartPage(ctk.CTkFrame):
         
         custom_font = font.Font(family="Bahnschrift SemiBold SemiConden",size=100, weight="bold")
 
-        side_background = CTkCanvas(self, width=150,
+        side_bar = CTkCanvas(self, width=150,
                                     height=1100, 
                                     bg="gray10",
                                     highlightthickness=0,
                                     )
-        side_background.pack(side=tk.LEFT, fill=tk.Y)
+        side_bar.pack(side=tk.LEFT, fill=tk.Y)
 
         title = tk.Label(self,text = "POTHOLE",font = custom_font,fg="white",bg="gray20")
         title.place(x=200,y=50)
@@ -66,35 +66,50 @@ class StartPage(ctk.CTkFrame):
         
         image_path1 = os.path.join(os.path.dirname(__file__), 'app_asset\maps.png')
         image1 = CTkImage(light_image=Image.open(image_path1), size=(90,90))
-        page2 = CTkButton(self, width=240, 
-                          height=300, text='\nSHOW MAPS',
-                          fg_color='grey', text_color='black',font=("Bahnschrift SemiBold SemiConden",22),
+        page2 = CTkButton(self, width=500, 
+                          height=150, text='  SHOW MAPS',
+                          fg_color='grey', text_color='gray10',font=("Bahnschrift SemiBold SemiConden",45),
                           command=lambda: controller.show_frame(Page2),
                           hover_color="#fce101",
                           image=image1
 
                           )
-        page2.place(x=100,y=370)
+        page2.place(x=100,y=360)
 
         
         # image_label1 = CTkLabel(page2,image=image1,text='',bg_color='grey20')
         # image_label1.place(x=1000)
 
-        page3 = CTkButton(self, width=240, 
-                          height=300, text='SHOW DATA',
-                          fg_color='grey', text_color='black',
+        image_path2 = os.path.join(os.path.dirname(__file__), 'app_asset\document.png')
+        image2 = CTkImage(light_image=Image.open(image_path2), size=(90,90))
+
+        page3 = CTkButton(self, width=500, 
+                          height=150, text=' SHOW DATA',
+                          fg_color='grey', text_color='gray10',
                           command=lambda: controller.show_frame(Page3),
                           hover_color="#fce101",
+                          image=image2,
+                          font=("Bahnschrift SemiBold SemiConden",45)
                           
                           )
-        page3.place(x=360,y=370)
+        page3.place(x=100,y=520)
 
+        image_home = os.path.join(os.path.dirname(__file__), 'app_asset\home.png')
+        imagehome = CTkImage(light_image=Image.open(image_home), size=(45,45))
+        image_home = CTkLabel(self,image=imagehome,text='',bg_color='grey20',width=100, height=100)
+        image_home.place(x=-12,y=45)
+        
 
-        side_background = Canvas(self, width=1180, height= 940, background="grey", highlightthickness=0)
-        side_background.place(x=1300,y=400)
+        side_background = Canvas(self, width=1250, height= 940, background="grey", highlightthickness=0)
+        side_background.place(x=1250,y=400)
 
-        title_side = CTkLabel(self,text="SYSTEM INFORMATION", font=("Bahnschrift SemiBold SemiConden",18),text_color="grey20",bg_color="grey")
-        title_side.place(x=872, y=220)
+        title_side = CTkLabel(self,text="SYSTEM INFORMATION", font=("Bahnschrift SemiBold SemiConden",18),text_color="grey10",bg_color="grey")
+        title_side.place(x=865, y=220)
+
+        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\map.png')
+        imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(55,55))
+        image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey10',width=100, height=100)
+        image_camera.place(x=-12,y=260)
 
 
         #============================= Untuk memasukan Foto ==================================================== #
@@ -104,61 +119,155 @@ class StartPage(ctk.CTkFrame):
         image_label.place(x=375,y=20)
         #============================= Untuk memasukan Foto ==================================================== #
 
-        
-    
 
+        title_side = CTkLabel(self,text="Beta Ver0.01.05", font=("Bahnschrift SemiBold SemiConden",12),text_color="grey",bg_color="grey20")
+        title_side.place(x=1190, y=680)
 
-    
+        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\kamera2.png')
+        imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(45,45))
+        image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey10',width=100, height=100)
+        image_camera.place(x=-12,y=150)
 
-        # Button untuk mengarahkan ke Page2
-        # page2_button = CTkButton(self, width=220,
-        #                         height=300, text='',
-        #                         fg_color='grey', text_color='black',
-        #                         command=lambda: controller.show_frame(Page2)
-        #                         )
-        # page2_button.pack(anchor=tk.NW, pady=20, padx=0, side=tk.LEFT)
-
-        # page3_button = CTkButton(self, width=220,
-        #                         height=300, text='',
-        #                         fg_color='grey', text_color='black',
-        #                         command=lambda: controller.show_frame(Page2)
-        #                         )
-        # page3_button.pack(anchor=tk.NW, pady=20, padx=50, side=tk.LEFT)
+        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\document1.png')
+        imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(55,55))
+        image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey10',width=100, height=100)
+        image_camera.place(x=-12,y=370)
 
 
 class Page1(ctk.CTkFrame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         
-        side_background = CTkCanvas(self, width=150,
+        side_bar = CTkCanvas(self, width=150,
                                     height=1100, 
                                     bg="gray10",
                                     highlightthickness=0
                                     )
-        side_background.pack(side=tk.LEFT, fill=tk.Y)
+        side_bar.pack(side=tk.LEFT, fill=tk.Y)
 
-        # canvas = tk.Canvas(self, width=1100, height=900)
-        # canvas.place(x=10,y=20)
+        image_home = os.path.join(os.path.dirname(__file__), 'app_asset\home.png')
+        imagehome = CTkImage(light_image=Image.open(image_home), size=(45,45))
+        # image_home = CTkLabel(self,image=imagehome,text='',bg_color='grey10',height=100)
+        # image_home.place(x=12,y=50)
 
+        page3 = CTkButton(side_bar, 
+                          text='',
+                          fg_color='grey10',
+                          command=lambda: controller.show_frame(StartPage),
+                          hover_color="#fce101",
+                          image=imagehome,
+                          height=100,
+                          width=75
+                    
+                          
+                          )
+        page3.place(x=0,y=45)
+
+        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\kamera2.png')
+        imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(45,45))
+        image_camera = CTkLabel(self,image=imagehome,text='',bg_color='grey20',width=100, height=100)
+        image_camera.place(x=-12,y=150)
+
+        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\map.png')
+        imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(55,55))
+        image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey10',width=100, height=100)
+        image_camera.place(x=-12,y=260)
+
+        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\document1.png')
+        imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(55,55))
+        image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey10',width=100, height=100)
+        image_camera.place(x=-12,y=370)
         
 
-
-
-
-        # label = ctk.CTkLabel(self, text="Ini adalah Page 1")
-        # label.pack()
 
 class Page2(ctk.CTkFrame):
     def __init__(self, parent, controller):
         super().__init__(parent)
-        label = ctk.CTkLabel(self, text="Ini adalah Page 2")
-        label.pack()
+
+        side_bar = CTkCanvas(self, width=150,
+                                    height=1100, 
+                                    bg="gray10",
+                                    highlightthickness=0,
+                                    )
+        side_bar.pack(side=tk.LEFT, fill=tk.Y)
+
+        image_home = os.path.join(os.path.dirname(__file__), 'app_asset\home.png')
+        imagehome = CTkImage(light_image=Image.open(image_home), size=(45,45))
+        # image_home = CTkLabel(self,image=imagehome,text='',bg_color='grey10',height=100)
+        # image_home.place(x=12,y=50)
+
+        page3 = CTkButton(side_bar, 
+                          text='',
+                          fg_color='grey10',
+                          command=lambda: controller.show_frame(StartPage),
+                          hover_color="#fce101",
+                          image=imagehome,
+                          height=100,
+                          width=75
+                    
+                          
+                          )
+        page3.place(x=0,y=45)
+
+        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\kamera2.png')
+        imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(45,45))
+        image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey10',width=100, height=100)
+        image_camera.place(x=-12,y=150)
+
+        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\map.png')
+        imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(55,55))
+        image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey20',width=100, height=100)
+        image_camera.place(x=-12,y=260)
+
+        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\document1.png')
+        imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(55,55))
+        image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey10',width=100, height=100)
+        image_camera.place(x=-12,y=370)
+        
 
 class Page3(ctk.CTkFrame):
     def __init__(self, parent, controller):
         super().__init__(parent)
-        label = ctk.CTkLabel(self, text="Ini adalah Page 3")
-        label.pack()
+        side_bar = CTkCanvas(self, width=150,
+                                    height=1100, 
+                                    bg="gray10",
+                                    highlightthickness=0,
+                                    )
+        side_bar.pack(side=tk.LEFT, fill=tk.Y)
+
+        image_home = os.path.join(os.path.dirname(__file__), 'app_asset\home.png')
+        imagehome = CTkImage(light_image=Image.open(image_home), size=(45,45))
+        # image_home = CTkLabel(self,image=imagehome,text='',bg_color='grey10',height=100)
+        # image_home.place(x=12,y=50)
+
+        page3 = CTkButton(side_bar, 
+                          text='',
+                          fg_color='grey10',
+                          command=lambda: controller.show_frame(StartPage),
+                          hover_color="#fce101",
+                          image=imagehome,
+                          height=100,
+                          width=75
+                    
+                          
+                          )
+        page3.place(x=0,y=45)
+
+        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\kamera2.png')
+        imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(45,45))
+        image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey10',width=100, height=100)
+        image_camera.place(x=-12,y=150)
+
+        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\map.png')
+        imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(55,55))
+        image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey10',width=100, height=100)
+        image_camera.place(x=-12,y=260)
+
+        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\document1.png')
+        imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(55,55))
+        image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey20',width=100, height=100)
+        image_camera.place(x=-12,y=370)
+
 
 
 if __name__ == "__main__":
@@ -166,6 +275,7 @@ if __name__ == "__main__":
     app.title('Pothole Detector')
     app.geometry("1280x720")
     app.resizable(False,False)
+    app.iconbitmap('app_asset/tool3_122846.ico')
     
     
     app.mainloop()
