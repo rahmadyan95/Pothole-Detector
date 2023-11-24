@@ -147,6 +147,8 @@ class StartPage(ctk.CTkFrame):
 class Page1(ctk.CTkFrame):
     def __init__(self, parent, controller):
         super().__init__(parent)
+
+        self.detection_running = False
         
         side_bar = CTkCanvas(self, width=150,
                                     height=1100, 
@@ -203,166 +205,183 @@ class Page1(ctk.CTkFrame):
 
         # ======================================== BOTTOM BOX ================================================#
 
-        bottombox = CTkLabel(self,height=143, width=1185,text='Bottom Box',bg_color="grey10")
+        bottombox = CTkLabel(self,height=143, width=1185,text="",bg_color="grey10")
         bottombox.place(x=85, y = 565)
 
         #========================================= VIDEO SECTION =======================================================#
 
         # video_canvas = CTkCanvas(self,w)
 
-        videobox = CTkCanvas(self, width=1920, height=1080)
-        videobox.place(x=170,y=20) 
+        self.videobox = CTkCanvas(self, width=1920, height=1080)
+        self.videobox.place(x=170,y=20) 
 
         self.photo = None
+
+        play_logo = os.path.join(os.path.dirname(__file__), 'app_asset\play.png')
+        imagelogo = CTkImage(light_image=Image.open(play_logo), size=(45,45))
+
+        playbox = CTkLabel(bottombox, width=390, height=120,bg_color='transparent',text='')
+        playbox.place(x=12,y=12)
+
+        textbox = CTkLabel(playbox, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text="Video Contol",bg_color='transparent',)
+        textbox.place(x=160,y=1)
+
+        start_button = CTkButton(playbox, 
+                                 text='START DETECTION',
+                                 command=self.start_detection,
+                                 fg_color='grey30',
+                                 hover_color="#228B22",
+                                 width=180,
+                                 height=75,
+                                 image=imagelogo,
+                                 font=("Bahnschrift SemiBold SemiConden",14)
+                                 )
+        start_button.place(x=10, y=35)
+
+        stop_button = CTkButton(playbox, 
+                                 text='STOP DETECTION',
+                                 command=self.start_detection,
+                                 fg_color='grey30',
+                                 hover_color="#FF0000",
+                                 width=180,
+                                 height=75,
+                                 image=imagelogo,
+                                 font=("Bahnschrift SemiBold SemiConden",14)
+                                 )
+        stop_button.place(x=200, y=35)
+         
+
         
-        def start_detection():
-            model = YOLO('custom.pt')
-            cap = cv2.VideoCapture("test2.mp4")
 
-            my_file = open('coco.txt', "r")
-            data = my_file.read()
-            class_list = data.split("\n")
 
-            count = 0
-            tracker = Tracker()
-            # lat, long = curr_loc.coordinates()
-
-            day, date, hour = curr_loc.time_stamp()
-            lat, long = curr_loc.coordinates()
-
-            data, counter1 = {}, []
-            coord_y_line1, offset = 700, 40
-            width, height = {}, {}
-
-            def crop_image(img, id):
-                x = datetime.datetime.now()
-                date = f'Detect at {x.day}_{x.month}_{x.year}'
-                hour = x.hour, x.minute, x.second, x.microsecond
-
-                fol_nam = "cropped_photo"
-                dir_path = date
-
-                fol_path = os.path.join(fol_nam, dir_path)
-
-                if os.path.exists(fol_path) and os.path.isdir(fol_path):
-                    pass
-                else:
-                    os.makedirs(fol_path)
-
-                # saving file
-                file_name = f'{id}_{hour}.png'
-                cv2.imwrite(os.path.join(fol_path, file_name), img)
-
-            def update_frame():
-                nonlocal count
-                ret, frame = cap.read()
-                if not ret :
-                    return
-
-                count += 1
-                if count % 3 != 0:
-                    videobox.after(10, update_frame)
-                    return
-
-                frame = cv2.resize(frame, (1920,1080))
-
-                results = model.predict(frame)
-                a = results[0].boxes.data
-                px = pd.DataFrame(a).astype("float")
-                pothole_list = []
-
-                for index, row in px.iterrows():
-                    x1, y1, x2, y2, _, d = map(int, row)
-                    c = class_list[d]
-                    if 'pothole' in c:
-                        pothole_list.append([x1, y1, x2, y2])
-
-                bbox_id = tracker.update(pothole_list)
-                for bbox in bbox_id:
-                    
-                    x3, y3, x4, y4, id = bbox
-                    cx, cy = int(x3 + x4) // 2, int(y3 + y4) // 2
-                    cv2.circle(frame, (cx, cy), 2, (255, 0, 255), -1)
-
-                    if coord_y_line1 < (cy + offset) and coord_y_line1 > (cy - offset):
-                        cv2.rectangle(frame, (x3, y3), (x4, y4), (0, 255, 0), 5)
-                        cvzone.putTextRect(frame, f'id: {id} {c}', (x3, y3), 1, 1)
-                        if counter1.count(id) == 0:
-                            width = round((x2 - x1) * 0.1949152542, 2)  # predict width
-                            height = round((y2 - y1) * 0.11392405, 2)  # predict height
-                            cv2.putText(frame, f'Width: {width}cm', (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
-                                        (0, 0, 255), 2)
-                            cv2.putText(frame, f'Height: {height}cm,', (x1, y1 - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
-                                        (0, 0, 255), 2)
-                            crop = frame[y3:y4, x3:x4]
-                            crop_image(crop, id)
-                            counter1.append(id)
-                            data[id] = {
-                                'Latitude': lat,
-                                'Longtitude': long,
-                                'Day': day,
-                                'Date': date,
-                                'Time': hour,
-                                'Width': width,
-                                'height': height
-                            }
-
-                cv2.line(frame, (3, coord_y_line1), (1920, coord_y_line1), (0, 225, 225), 5)
-
-                cv2.putText(frame, text=f'Total Pothole = {len(counter1)}', org=(30, 450),
-                            fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=0.7,
-                            color=(0, 255, 0), thickness=1)
-
-                cv2.putText(frame, text='Screening Line', org=(10, 600),
-                            fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=1,
-                            color=(0, 255, 0), thickness=2)
-
-                cv2.putText(frame, text=f'Loc = {lat, long}', org=(10, 380),
-                            fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=0.5,
-                            color=(0, 255, 0), thickness=1)
-
-                # Convert the frame to RGB format
-                rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-                # Convert the NumPy array to a PhotoImage object
-                self.photo = ImageTk.PhotoImage(Image.fromarray(rgb_frame))
-                # Update the videobox canvas with the new image
-                videobox.create_image(0, 0, anchor=tk.NW, image=self.photo)
-
-                videobox.after(10, update_frame)
-
-            update_frame()
         
+    def start_detection(self):
+        model = YOLO('custom.pt')
+        cap = cv2.VideoCapture("test2.mp4")
+
+        my_file = open('coco.txt', "r")
+        data = my_file.read()
+        class_list = data.split("\n")
+
+        count = 0
+        tracker = Tracker()
+        # lat, long = curr_loc.coordinates()
+
+        day, date, hour = curr_loc.time_stamp()
+        lat, long = curr_loc.coordinates()
+
+        data, counter1 = {}, []
+        coord_y_line1, offset = 700, 40
+        width, height = {}, {}
+
+        def crop_image(img, id):
+            x = datetime.datetime.now()
+            date = f'Detect at {x.day}_{x.month}_{x.year}'
+            hour = x.hour, x.minute, x.second, x.microsecond
+
+            fol_nam = "cropped_photo"
+            dir_path = date
+
+            fol_path = os.path.join(fol_nam, dir_path)
+
+            if os.path.exists(fol_path) and os.path.isdir(fol_path):
+                pass
+            else:
+                os.makedirs(fol_path)
+
+            # saving file
+            file_name = f'{id}_{hour}.png'
+            cv2.imwrite(os.path.join(fol_path, file_name), img)
+
+        def update_frame():
+            nonlocal count
+            ret, frame = cap.read()
+            if not ret :
+                return
+
+            count += 1
+            if count % 3 != 0:
+                self.videobox.after(10, update_frame)
+                return
+
+            frame = cv2.resize(frame, (1920,1080))
+
+            results = model.predict(frame)
+            a = results[0].boxes.data
+            px = pd.DataFrame(a).astype("float")
+            pothole_list = []
+
+            for index, row in px.iterrows():
+                x1, y1, x2, y2, _, d = map(int, row)
+                c = class_list[d]
+                if 'pothole' in c:
+                    pothole_list.append([x1, y1, x2, y2])
+
+            bbox_id = tracker.update(pothole_list)
+            for bbox in bbox_id:
+                
+                x3, y3, x4, y4, id = bbox
+                cx, cy = int(x3 + x4) // 2, int(y3 + y4) // 2
+                cv2.circle(frame, (cx, cy), 2, (255, 0, 255), -1)
+
+                if coord_y_line1 < (cy + offset) and coord_y_line1 > (cy - offset):
+                    cv2.rectangle(frame, (x3, y3), (x4, y4), (0, 255, 0), 5)
+                    cvzone.putTextRect(frame, f'id: {id} {c}', (x3, y3), 1, 1)
+                    if counter1.count(id) == 0:
+                        width = round((x2 - x1) * 0.1949152542, 2)  # predict width
+                        height = round((y2 - y1) * 0.11392405, 2)  # predict height
+                        cv2.putText(frame, f'Width: {width}cm', (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                                    (0, 0, 255), 2)
+                        cv2.putText(frame, f'Height: {height}cm,', (x1, y1 - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
+                                    (0, 0, 255), 2)
+                        crop = frame[y3:y4, x3:x4]
+                        crop_image(crop, id)
+                        counter1.append(id)
+                        data[id] = {
+                            'Latitude': lat,
+                            'Longtitude': long,
+                            'Day': day,
+                            'Date': date,
+                            'Time': hour,
+                            'Width': width,
+                            'height': height
+                        }
+
+            cv2.line(frame, (3, coord_y_line1), (1920, coord_y_line1), (0, 225, 225), 5)
+
+            cv2.putText(frame, text=f'Total Pothole = {len(counter1)}', org=(30, 450),
+                        fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=0.7,
+                        color=(0, 255, 0), thickness=1)
+
+            cv2.putText(frame, text='Screening Line', org=(10, 600),
+                        fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=1,
+                        color=(0, 255, 0), thickness=2)
+
+            cv2.putText(frame, text=f'Loc = {lat, long}', org=(10, 380),
+                        fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=0.5,
+                        color=(0, 255, 0), thickness=1)
+
+            # Convert the frame to RGB format
+            rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            # Convert the NumPy array to a PhotoImage object
+            self.photo = ImageTk.PhotoImage(Image.fromarray(rgb_frame))
+            # Update the videobox canvas with the new image
+            self.videobox.create_image(0, 0, anchor=tk.NW, image=self.photo)
+
+            self.videobox.after(10, update_frame)
+
+        update_frame()
+    
         # def start_vid():
         #     threading.Thread(target=start_detection,args=()).start()
             
         
 
         # Add a button to start the detection
-        start_button = CTkButton(self, 
-                                 text='Start Detection',
-                                 command=start_detection,
-                                 fg_color='grey10',
-                                 hover_color="#fce101",
-                                 width=15
-                                 )
-        start_button.place(x=20, y=500)
-
         
 
-
-
-
-
-
-
-
-
-
-
-        
-
-
-        #========================================END VIDEO SECTION =====================================================#
+    
+        #======================================== END VIDEO SECTION ===================================================== #
         
 
 

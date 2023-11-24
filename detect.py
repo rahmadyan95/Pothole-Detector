@@ -28,7 +28,7 @@ def detect ():
     day,date, hour = curr_loc.time_stamp() 
 
     data, counter1 = {},[]
-    coord_y_line1, offset = 290, 25
+    coord_y_line1, offset = 390, 25
     width, height = {},{}
 
     def crop_image (img):
@@ -73,8 +73,6 @@ def detect ():
             x2=int(row[2])
             y2=int(row[3])
             d=int(row[5])
-
-           
             
             c=class_list[d]
             if 'pothole' in c:
@@ -125,8 +123,11 @@ def detect ():
         cv2.putText(frame, text= f'Loc = {lat,long}', org=(10, 380), 
                     fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=0.5, 
                     color=(0, 255, 0),thickness=1)
+
     
         cv2.imshow("Pothole Detector", frame)
+
+
         if cv2.waitKey(1)&0xFF==27:
             break
     
