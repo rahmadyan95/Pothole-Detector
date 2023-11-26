@@ -15,6 +15,8 @@ import curr_loc as curr_loc
 import os
 import datetime
 import threading
+from customtkinter import filedialog
+from CTkMessagebox import CTkMessagebox 
 
 class tkinterApp(ctk.CTk):
     def __init__(self, *args, **kwargs):
@@ -148,7 +150,7 @@ class Page1(ctk.CTkFrame):
     def __init__(self, parent, controller):
         super().__init__(parent)
 
-        self.detection_running = False
+        
         
         side_bar = CTkCanvas(self, width=150,
                                     height=1100, 
@@ -216,9 +218,8 @@ class Page1(ctk.CTkFrame):
         self.videobox.place(x=170,y=20) 
 
         self.photo = None
-
-        play_logo = os.path.join(os.path.dirname(__file__), 'app_asset\play.png')
-        imagelogo = CTkImage(light_image=Image.open(play_logo), size=(45,45))
+        self.stopped = False
+        
 
         playbox = CTkLabel(bottombox, width=390, height=120,bg_color='transparent',text='')
         playbox.place(x=12,y=12)
@@ -226,6 +227,42 @@ class Page1(ctk.CTkFrame):
         textbox = CTkLabel(playbox, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text="Video Contol",bg_color='transparent',)
         textbox.place(x=160,y=1)
 
+
+
+        input = CTkLabel(bottombox, width=390, height=120,bg_color='transparent',text='')
+        input.place(x=500,y=12)
+
+        inputtextbox = CTkLabel(input, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text="Video Contol",bg_color='transparent',)
+        inputtextbox.place(x=160,y=1)
+
+        self.file_name = CTkLabel(input, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text=f"path : ",bg_color='transparent',)
+        self.file_name.place(x=100,y=35)
+        
+
+        
+        start_button = CTkButton(input, 
+                                 text='Select File',
+                                 command=self.select_file,
+                                 fg_color='grey30',
+                                 hover_color="#228B22",
+                                 width=80,
+                                 height=20,
+                                 font=("Bahnschrift SemiBold SemiConden",14)
+                                 )
+        start_button.place(x=10, y=35)
+
+
+        
+
+
+
+
+
+
+        
+
+        play_logo = os.path.join(os.path.dirname(__file__), 'app_asset\play.png')
+        imagelogo = CTkImage(light_image=Image.open(play_logo), size=(45,45))
         start_button = CTkButton(playbox, 
                                  text='START DETECTION',
                                  command=self.start_detection,
@@ -238,26 +275,54 @@ class Page1(ctk.CTkFrame):
                                  )
         start_button.place(x=10, y=35)
 
+        stop_logo = os.path.join(os.path.dirname(__file__), 'app_asset\stop2.png')
+        imagestop = CTkImage(light_image=Image.open(stop_logo), size=(45,45))
         stop_button = CTkButton(playbox, 
                                  text='STOP DETECTION',
-                                 command=self.start_detection,
+                                 command=self.stop_detection,
                                  fg_color='grey30',
                                  hover_color="#FF0000",
                                  width=180,
                                  height=75,
-                                 image=imagelogo,
+                                 image=imagestop,
                                  font=("Bahnschrift SemiBold SemiConden",14)
                                  )
         stop_button.place(x=200, y=35)
-         
+    
+    def select_file(self):
 
+        self.filename_var = tk.StringVar()
+
+        filetypes = (
+            ('MP4 files', '*.mp4'),
+            ('AVI files', '*.avi'),
+            ('MKV files', '*.mkv'),
+            ('All files', '*.*')
+        )
+
+        self.filename = filedialog.askopenfilename(
+            title='Open a file',
+            initialdir='/',
+            filetypes=filetypes
+            )
         
 
-
+        self.filename_var.set(os.path.basename(self.filename))
+        self.file_name.configure(text=f"Path : {self.filename_var.get()}")
+        # print(self.filename_var)
         
+
+          
+
+    def stop_detection(self):
+        self.stopped = True
+        self.videobox.delete("all")
+
     def start_detection(self):
+        self.stopped = False
         model = YOLO('custom.pt')
-        cap = cv2.VideoCapture("test2.mp4")
+        # cap = cv2.VideoCapture("test2.mp4")
+        cap = cv2.VideoCapture(self.filename)
 
         my_file = open('coco.txt', "r")
         data = my_file.read()
@@ -295,6 +360,13 @@ class Page1(ctk.CTkFrame):
 
         def update_frame():
             nonlocal count
+            nonlocal cap
+            nonlocal model
+
+            if self.stopped:
+                cap.release()
+                return
+            
             ret, frame = cap.read()
             if not ret :
                 return
@@ -369,8 +441,9 @@ class Page1(ctk.CTkFrame):
             self.videobox.create_image(0, 0, anchor=tk.NW, image=self.photo)
 
             self.videobox.after(10, update_frame)
-
-        update_frame()
+        
+        if not self.stopped:
+            update_frame()
     
         # def start_vid():
         #     threading.Thread(target=start_detection,args=()).start()
