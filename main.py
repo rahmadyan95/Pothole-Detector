@@ -15,7 +15,7 @@ import curr_loc as curr_loc
 import os
 import datetime
 import threading
-from customtkinter import filedialog
+from customtkinter import filedialog, BooleanVar
 from CTkMessagebox import CTkMessagebox 
 
 class tkinterApp(ctk.CTk):
@@ -150,8 +150,6 @@ class Page1(ctk.CTkFrame):
     def __init__(self, parent, controller):
         super().__init__(parent)
 
-        
-        
         side_bar = CTkCanvas(self, width=150,
                                     height=1100, 
                                     bg="gray10",
@@ -194,13 +192,39 @@ class Page1(ctk.CTkFrame):
 
         #======================================== SIDE BOX SECTION ====================================================#
         
-        lat, long = curr_loc.coordinates()
-
+        
         sidebox = CTkLabel(self,height=542, width=210,text="",bg_color="grey10")
         sidebox.place(x=1060, y = 10)
+        
+        # JUDUL KOTAK SAMPING
+        title_sidebox = CTkLabel(sidebox,bg_color="grey10",text='Video Data',font=("Bahnschrift SemiBold SemiConden",16),text_color='white')
+        title_sidebox.place(x=74, y = 5)
 
-        latitude = CTkLabel(sidebox,text=f'Latitude = {lat}\nLongitude = {long}',bg_color="grey10",font=("consolas",12),text_color='white')
-        latitude.place(x=10, y = 10)
+        countbox = CTkLabel(sidebox,bg_color="grey20",text='',width=200,height=100)
+        countbox.place(x=5, y = 50)
+
+        numberbox = CTkLabel(countbox,bg_color="grey20",text='Pothole Counter',font=("Bahnschrift SemiBold SemiConden",14),width=190,height=60)
+        numberbox.place(x=5, y = -12)
+
+        self.latitude = CTkLabel(countbox,bg_color="grey10",text='0',width=190,height=60,font=("Bahnschrift SemiBold SemiConden",24))
+        self.latitude.place(x=5, y = 35)
+
+        # Latitude longitude
+
+        latbox = CTkLabel(sidebox,bg_color="grey20",text='',width=200,height=100)
+        latbox.place(x=5, y = 170)
+
+        titlebox = CTkLabel(latbox,bg_color="transparent",text='Location',font=("Bahnschrift SemiBold SemiConden",14),width=190,height=60)
+        titlebox.place(x=5, y = 0)
+
+        self.lat = CTkLabel(latbox,bg_color="transparent",text='Latitude',width=190,height=60,font=("Bahnschrift SemiBold SemiConden",14))
+        self.lat.place(x=-20, y = 10)
+
+        
+
+        
+
+
         
 
 
@@ -210,12 +234,12 @@ class Page1(ctk.CTkFrame):
         bottombox = CTkLabel(self,height=143, width=1185,text="",bg_color="grey10")
         bottombox.place(x=85, y = 565)
 
+        self.videobox = CTkCanvas(self, width=1920, height=1080)
+        self.videobox.place(x=170,y=20) 
+
         #========================================= VIDEO SECTION =======================================================#
 
         # video_canvas = CTkCanvas(self,w)
-
-        self.videobox = CTkCanvas(self, width=1920, height=1080)
-        self.videobox.place(x=170,y=20) 
 
         self.photo = None
         self.stopped = False
@@ -230,36 +254,46 @@ class Page1(ctk.CTkFrame):
 
 
         input = CTkLabel(bottombox, width=390, height=120,bg_color='transparent',text='')
-        input.place(x=500,y=12)
+        input.place(x=410,y=12)
 
-        inputtextbox = CTkLabel(input, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text="Video Contol",bg_color='transparent',)
+        inputtextbox = CTkLabel(input, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text="Video Source",bg_color='transparent',)
         inputtextbox.place(x=160,y=1)
 
         self.file_name = CTkLabel(input, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text=f"path : ",bg_color='transparent',)
-        self.file_name.place(x=100,y=35)
+        self.file_name.place(x=100,y=30)
+
+        self.checkbox_var = BooleanVar()
+        self.checkbox1 = CTkCheckBox(input, text="File Source", variable=self.checkbox_var, command=self.on_checkbox_change,font=("Bahnschrift SemiBold SemiConden",14))
+        self.checkbox1.place(x=265,y=35)
         
+        
+        self.manual_input = CTkTextbox(input,height=12,width=200,font=("Bahnschrift SemiBold SemiConden",14))
+        self.manual_input.place(x=10 ,y= 65)
+        self.manual_input.configure(state="disabled")
+
+        self.checkbox_var_manual = BooleanVar()
+        self.checkbox2 = CTkCheckBox(input, text="Manual Source", variable=self.checkbox_var_manual, command=self.on_checkbox_change,font=("Bahnschrift SemiBold SemiConden",14))
+        self.checkbox2.place(x=265,y=70)
+
+
+
 
         
-        start_button = CTkButton(input, 
+        self.file_input = CTkButton(input, 
                                  text='Select File',
                                  command=self.select_file,
                                  fg_color='grey30',
-                                 hover_color="#228B22",
+                                 hover_color="#fce101",
                                  width=80,
                                  height=20,
                                  font=("Bahnschrift SemiBold SemiConden",14)
+                                
                                  )
-        start_button.place(x=10, y=35)
+        self.file_input.place(x=10, y=35)
+        self.file_input.configure(state="disabled")
 
-
-        
-
-
-
-
-
-
-        
+    
+    
 
         play_logo = os.path.join(os.path.dirname(__file__), 'app_asset\play.png')
         imagelogo = CTkImage(light_image=Image.open(play_logo), size=(45,45))
@@ -288,6 +322,62 @@ class Page1(ctk.CTkFrame):
                                  font=("Bahnschrift SemiBold SemiConden",14)
                                  )
         stop_button.place(x=200, y=35)
+
+        self.data = {}
+
+        # Untuk File handler csv
+
+        select_folder = CTkLabel(bottombox, width=360, height=120,bg_color='transparent',text='')
+        select_folder.place(x=810,y=12)
+
+        select_foldertextbox = CTkLabel(select_folder, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text="Save Data",bg_color='transparent',)
+        select_foldertextbox.place(x=155,y=1)
+
+        self.folderinput = CTkButton(select_folder, 
+                                 text='Select Folder',
+                                 command=self.select_folder,
+                                 fg_color='grey30',
+                                 hover_color="#fce101",
+                                 width=80,
+                                 height=20,
+                                 font=("Bahnschrift SemiBold SemiConden",14)
+                                
+                                 )
+        self.folderinput.place(x=10, y=35)
+        # self.file_input.configure(state="disabled")
+
+        self.folder_name = CTkLabel(select_folder, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text=f"path : ",bg_color='transparent',)
+        self.folder_name.place(x=100,y=30)
+
+        self.checkbox_var_save = BooleanVar()
+        self.save = CTkCheckBox(select_folder, text="Save cropped", variable=self.checkbox_var_save,font=("Bahnschrift SemiBold SemiConden",14))
+        self.save.place(x=235,y=34)
+
+        self.folder_file_name = CTkTextbox(select_folder,height=12,width=200,font=("Bahnschrift SemiBold SemiConden",14))
+        self.folder_file_name.place(x=10 ,y= 65)
+
+
+    def on_checkbox_change(self):
+        
+        if self.checkbox_var.get():
+            # Checkbox is checked, enable the button
+            self.checkbox_var_manual.set(False)
+            self.file_input.configure(state="normal")
+            self.manual_input.configure(state="disabled")
+            
+        elif self.checkbox_var_manual.get():
+            # Checkbox is unchecked, disable the button
+            self.checkbox_var.set(False)
+            self.file_input.configure(state="disabled")
+            self.manual_input.configure(state="normal")
+
+        else :
+            self.checkbox_var.set(False)
+            self.checkbox_var_manual.set(False)
+            self.file_input.configure(state="disabled")
+            self.manual_input.configure(state="disabled")
+
+
     
     def select_file(self):
 
@@ -306,24 +396,65 @@ class Page1(ctk.CTkFrame):
             filetypes=filetypes
             )
         
-
         self.filename_var.set(os.path.basename(self.filename))
         self.file_name.configure(text=f"Path : {self.filename_var.get()}")
         # print(self.filename_var)
+
+    def select_folder(self):
+
+        self.foldername_var = StringVar()
+
+        self.foldername = filedialog.askdirectory(title="Select Folder to Save",
+                                                  initialdir='/')
         
+        self.foldername_var.set(os.path.basename(self.foldername))
+        self.folder_name.configure(text=f"Path : {self.foldername_var.get()}")
+        
+        
+    def crop_image(self,img, id):
+        
+        x = datetime.datetime.now()
 
-          
+        folder_title = str(self.folder_file_name.get(1.0, "end-1c"))
+        main_path = f"{str(self.foldername)}"  
+        main_folder = os.path.join(main_path, folder_title)
 
-    def stop_detection(self):
-        self.stopped = True
-        self.videobox.delete("all")
+        if not os.path.exists(main_folder):
+            os.makedirs(main_folder)
 
+        file_name = f'{id}_{x.hour}_{x.minute}_{x.second}_{x.microsecond}.png'
+        cv2.imwrite(os.path.join(main_folder, file_name), img)
+        
+    def on_start(self):
+
+        self.file_input.configure(state="disabled")
+        self.manual_input.configure(state="disabled")
+        self.folderinput.configure(state="disabled")
+        self.save.configure(state="disabled")
+        self.checkbox1.configure(state="disabled")
+        self.checkbox2.configure(state="disabled")
+        self.folder_file_name.configure(state="disabled")
+    
     def start_detection(self):
+        
+        self.on_start()
+        
         self.stopped = False
         model = YOLO('custom.pt')
         # cap = cv2.VideoCapture("test2.mp4")
-        cap = cv2.VideoCapture(self.filename)
 
+        try :
+            if self.checkbox_var.get():
+                cap = cv2.VideoCapture(self.filename)
+            else:
+                cap = cv2.VideoCapture(int(self.manual_input.get(1.0, "end-1c")))
+
+        except Exception as e :
+            error_message = "Video Source Is Empty"
+            CTkMessagebox(self,title="Error",message=error_message, height=200,width=400,icon="warning",
+                          font=("Bahnschrift SemiBold SemiConden",14))
+            return
+            
         my_file = open('coco.txt', "r")
         data = my_file.read()
         class_list = data.split("\n")
@@ -339,29 +470,14 @@ class Page1(ctk.CTkFrame):
         coord_y_line1, offset = 700, 40
         width, height = {}, {}
 
-        def crop_image(img, id):
-            x = datetime.datetime.now()
-            date = f'Detect at {x.day}_{x.month}_{x.year}'
-            hour = x.hour, x.minute, x.second, x.microsecond
-
-            fol_nam = "cropped_photo"
-            dir_path = date
-
-            fol_path = os.path.join(fol_nam, dir_path)
-
-            if os.path.exists(fol_path) and os.path.isdir(fol_path):
-                pass
-            else:
-                os.makedirs(fol_path)
-
-            # saving file
-            file_name = f'{id}_{hour}.png'
-            cv2.imwrite(os.path.join(fol_path, file_name), img)
+        
 
         def update_frame():
             nonlocal count
             nonlocal cap
             nonlocal model
+
+            
 
             if self.stopped:
                 cap.release()
@@ -392,6 +508,7 @@ class Page1(ctk.CTkFrame):
             bbox_id = tracker.update(pothole_list)
             for bbox in bbox_id:
                 
+                
                 x3, y3, x4, y4, id = bbox
                 cx, cy = int(x3 + x4) // 2, int(y3 + y4) // 2
                 cv2.circle(frame, (cx, cy), 2, (255, 0, 255), -1)
@@ -400,6 +517,7 @@ class Page1(ctk.CTkFrame):
                     cv2.rectangle(frame, (x3, y3), (x4, y4), (0, 255, 0), 5)
                     cvzone.putTextRect(frame, f'id: {id} {c}', (x3, y3), 1, 1)
                     if counter1.count(id) == 0:
+                        
                         width = round((x2 - x1) * 0.1949152542, 2)  # predict width
                         height = round((y2 - y1) * 0.11392405, 2)  # predict height
                         cv2.putText(frame, f'Width: {width}cm', (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
@@ -407,9 +525,12 @@ class Page1(ctk.CTkFrame):
                         cv2.putText(frame, f'Height: {height}cm,', (x1, y1 - 30), cv2.FONT_HERSHEY_SIMPLEX, 0.5,
                                     (0, 0, 255), 2)
                         crop = frame[y3:y4, x3:x4]
-                        crop_image(crop, id)
+
+                        if self.checkbox_var_save.get():
+                            self.crop_image(crop, id)
+
                         counter1.append(id)
-                        data[id] = {
+                        self.data[id] = {
                             'Latitude': lat,
                             'Longtitude': long,
                             'Day': day,
@@ -419,11 +540,15 @@ class Page1(ctk.CTkFrame):
                             'height': height
                         }
 
+            
+
             cv2.line(frame, (3, coord_y_line1), (1920, coord_y_line1), (0, 225, 225), 5)
 
-            cv2.putText(frame, text=f'Total Pothole = {len(counter1)}', org=(30, 450),
-                        fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=0.7,
-                        color=(0, 255, 0), thickness=1)
+            # cv2.putText(frame, text=f'Total Pothole = {len(counter1)}', org=(30, 450),
+            #             fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=0.7,
+            #             color=(0, 255, 0), thickness=1)
+            
+            self.latitude.configure(text=f'{len(counter1)}')
 
             cv2.putText(frame, text='Screening Line', org=(10, 600),
                         fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=1,
@@ -441,21 +566,36 @@ class Page1(ctk.CTkFrame):
             self.videobox.create_image(0, 0, anchor=tk.NW, image=self.photo)
 
             self.videobox.after(10, update_frame)
+
+            
         
         if not self.stopped:
             update_frame()
-    
-        # def start_vid():
-        #     threading.Thread(target=start_detection,args=()).start()
+
+    def on_stop(self):
+        self.file_input.configure(state="normal")
+        self.manual_input.configure(state="normal")
+        self.folderinput.configure(state="normal")
+        self.save.configure(state="normal")
+        self.checkbox1.configure(state="normal")
+        self.checkbox2.configure(state="normal")
+        self.folder_file_name.configure(state="normal")
+        self.latitude.configure(text='0')
+
+    def stop_detection(self):
+        self.stopped = True
+        self.videobox.delete("all")
+        self.on_stop()
+
+        if self.data:
+            df = pd.DataFrame.from_dict(self.data, orient='index')
+            csv_filename = os.path.join(str(self.foldername), f'{str(self.folder_file_name.get(1.0, "end-1c"))}')
+            df.to_csv(csv_filename, index_label='ID')
+            success_message = f'Data saved to {csv_filename}'
+            CTkMessagebox(self, title="Success", message=success_message, height=200, width=400, icon="info",
+                        font=("Bahnschrift SemiBold SemiConden", 14))
             
-        
 
-        # Add a button to start the detection
-        
-
-    
-        #======================================== END VIDEO SECTION ===================================================== #
-        
 
 
 class Page2(ctk.CTkFrame):
