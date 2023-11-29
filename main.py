@@ -16,7 +16,11 @@ import os
 import datetime
 import threading
 from customtkinter import filedialog, BooleanVar
-from CTkMessagebox import CTkMessagebox 
+from CTkMessagebox import CTkMessagebox
+from datetime import timedelta 
+from datetime import timedelta
+from curr_loc import run_all_functions
+
 
 class tkinterApp(ctk.CTk):
     def __init__(self, *args, **kwargs):
@@ -150,6 +154,16 @@ class Page1(ctk.CTkFrame):
     def __init__(self, parent, controller):
         super().__init__(parent)
 
+        
+
+        self.is_running = False 
+        self.elapsed_time = timedelta()
+
+        self.time_var = StringVar()
+        self.time_var.set(self.format_time(self.elapsed_time))
+
+
+
         side_bar = CTkCanvas(self, width=150,
                                     height=1100, 
                                     bg="gray10",
@@ -203,30 +217,42 @@ class Page1(ctk.CTkFrame):
         countbox = CTkLabel(sidebox,bg_color="grey20",text='',width=200,height=100)
         countbox.place(x=5, y = 50)
 
-        numberbox = CTkLabel(countbox,bg_color="grey20",text='Pothole Counter',font=("Bahnschrift SemiBold SemiConden",14),width=190,height=60)
-        numberbox.place(x=5, y = -12)
+        numberbox = CTkLabel(countbox,bg_color="grey20",text='Pothole Counter',font=("Bahnschrift SemiBold SemiConden",14))
+        numberbox.place(x=55, y = 2)
 
-        self.latitude = CTkLabel(countbox,bg_color="grey10",text='0',width=190,height=60,font=("Bahnschrift SemiBold SemiConden",24))
-        self.latitude.place(x=5, y = 35)
+        self.counter_pothole = CTkLabel(countbox,bg_color="gray10",text='0',width=190,height=60,font=("Bahnschrift SemiBold SemiConden",24))
+        self.counter_pothole.place(x=5, y = 35)
 
         # Latitude longitude
 
-        latbox = CTkLabel(sidebox,bg_color="grey20",text='',width=200,height=100)
-        latbox.place(x=5, y = 170)
+        latbox = CTkLabel(sidebox,bg_color="grey20",text='',width=200,height=150)
+        latbox.place(x=5, y = 160)
 
-        titlebox = CTkLabel(latbox,bg_color="transparent",text='Location',font=("Bahnschrift SemiBold SemiConden",14),width=190,height=60)
-        titlebox.place(x=5, y = 0)
+        location_box = CTkLabel(latbox,bg_color="transparent",text='Location',font=("Bahnschrift SemiBold SemiConden",14))
+        location_box.place(x=75, y = 2)
 
-        self.lat = CTkLabel(latbox,bg_color="transparent",text='Latitude',width=190,height=60,font=("Bahnschrift SemiBold SemiConden",14))
-        self.lat.place(x=-20, y = 10)
+        self.latitude = CTkLabel(latbox,bg_color="transparent",text='Latitude\t\t = - °E',font=("Bahnschrift SemiBold SemiConden",14))
+        self.latitude.place(x=5, y = 30)
 
+        self.longitude = CTkLabel(latbox,bg_color="transparent",text='Longitude\t\t = - °N',font=("Bahnschrift SemiBold SemiConden",14))
+        self.longitude.place(x=5, y = 50)
+
+        self.altimeter = CTkLabel(latbox,bg_color="transparent",text='Altitude\t\t = - m asl',font=("Bahnschrift SemiBold SemiConden",14))
+        self.altimeter.place(x=5, y = 70)
+
+        self.suhu = CTkLabel(latbox,bg_color="transparent",text='Temperature\t = - °C',font=("Bahnschrift SemiBold SemiConden",14))
+        self.suhu.place(x=5, y = 90)
+
+        # DURATION BOX 
         
+        durationbox = CTkLabel(sidebox,bg_color="grey20",text='',width=200,height=95)
+        durationbox.place(x=5, y = 320)
 
-        
+        duration_title = CTkLabel(durationbox,bg_color="transparent",text='Detection Duration',font=("Bahnschrift SemiBold SemiConden",14))
+        duration_title.place(x=50, y = 2)
 
-
-        
-
+        self.duration = CTkLabel(durationbox,bg_color="gray10",textvariable=self.time_var,width=190,height=50,font=("Bahnschrift SemiBold SemiConden",24))
+        self.duration.place(x=5, y = 35)
 
 
         # ======================================== BOTTOM BOX ================================================#
@@ -248,10 +274,8 @@ class Page1(ctk.CTkFrame):
         playbox = CTkLabel(bottombox, width=390, height=120,bg_color='transparent',text='')
         playbox.place(x=12,y=12)
 
-        textbox = CTkLabel(playbox, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text="Video Contol",bg_color='transparent',)
+        textbox = CTkLabel(playbox, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text="Video Control",bg_color='transparent',)
         textbox.place(x=160,y=1)
-
-
 
         input = CTkLabel(bottombox, width=390, height=120,bg_color='transparent',text='')
         input.place(x=410,y=12)
@@ -276,12 +300,9 @@ class Page1(ctk.CTkFrame):
         self.checkbox2.place(x=265,y=70)
 
 
-
-
-        
         self.file_input = CTkButton(input, 
                                  text='Select File',
-                                 command=self.select_file,
+                                 command=(self.select_file),
                                  fg_color='grey30',
                                  hover_color="#fce101",
                                  width=80,
@@ -292,14 +313,11 @@ class Page1(ctk.CTkFrame):
         self.file_input.place(x=10, y=35)
         self.file_input.configure(state="disabled")
 
-    
-    
-
         play_logo = os.path.join(os.path.dirname(__file__), 'app_asset\play.png')
         imagelogo = CTkImage(light_image=Image.open(play_logo), size=(45,45))
         start_button = CTkButton(playbox, 
                                  text='START DETECTION',
-                                 command=self.start_detection,
+                                 command=(self.start_detection_thread),
                                  fg_color='grey30',
                                  hover_color="#228B22",
                                  width=180,
@@ -344,7 +362,7 @@ class Page1(ctk.CTkFrame):
                                 
                                  )
         self.folderinput.place(x=10, y=35)
-        # self.file_input.configure(state="disabled")
+        self.file_input.configure(state="disabled")
 
         self.folder_name = CTkLabel(select_folder, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text=f"path : ",bg_color='transparent',)
         self.folder_name.place(x=100,y=30)
@@ -353,10 +371,29 @@ class Page1(ctk.CTkFrame):
         self.save = CTkCheckBox(select_folder, text="Save cropped", variable=self.checkbox_var_save,font=("Bahnschrift SemiBold SemiConden",14))
         self.save.place(x=235,y=34)
 
-        self.folder_file_name = CTkTextbox(select_folder,height=12,width=200,font=("Bahnschrift SemiBold SemiConden",14))
-        self.folder_file_name.place(x=10 ,y= 65)
+        self.folder_file_name = CTkEntry(select_folder,height=24,width=250,font=("Bahnschrift SemiBold SemiConden",14),
+                                         placeholder_text="",text_color="white")
+        self.folder_file_name.place(x=9 ,y= 87)
 
+        self.folder_name = CTkLabel(select_folder, text_color='white',font=("Bahnschrift SemiBold SemiConden",13),text="Input name for folder and data file",bg_color='transparent',)
+        self.folder_name.place(x=10,y=58)
 
+    # Format Time ============================================
+    def update_time(self):
+        if self.is_running:
+            self.elapsed_time += timedelta(milliseconds=100)
+            self.time_var.set(self.format_time(self.elapsed_time))
+            self.duration.after(100, self.update_time)
+        else:
+            self.duration.after_cancel(self.update_time)
+    
+    
+    def format_time(self, elapsed_time):
+        milliseconds = int(elapsed_time.total_seconds() * 1000)
+        minutes, seconds = divmod(milliseconds // 1000, 60)
+        return f"{minutes:02d}:{seconds:02d}.{milliseconds % 1000 // 10:02d}"
+
+    
     def on_checkbox_change(self):
         
         if self.checkbox_var.get():
@@ -426,7 +463,12 @@ class Page1(ctk.CTkFrame):
         cv2.imwrite(os.path.join(main_folder, file_name), img)
         
     def on_start(self):
+        
+        if not self.is_running:
+            self.is_running = True
+            self.update_time()
 
+        
         self.file_input.configure(state="disabled")
         self.manual_input.configure(state="disabled")
         self.folderinput.configure(state="disabled")
@@ -435,7 +477,22 @@ class Page1(ctk.CTkFrame):
         self.checkbox2.configure(state="disabled")
         self.folder_file_name.configure(state="disabled")
     
+    
+    def start_detection_thread(self):
+        detection_thread = threading.Thread(target=self.start_detection)
+        detection_thread.start()
+
+
+
     def start_detection(self):
+
+        input_content = self.folder_file_name
+        if not input_content.get():
+             error_message = "File and Folder name is Empty"
+             CTkMessagebox(self,title="Error",message=error_message, height=200,width=400,icon="warning",
+                          font=("Bahnschrift SemiBold SemiConden",14))
+             
+             return
         
         self.on_start()
         
@@ -463,9 +520,14 @@ class Page1(ctk.CTkFrame):
         tracker = Tracker()
         # lat, long = curr_loc.coordinates()
 
-        day, date, hour = curr_loc.time_stamp()
-        lat, long = curr_loc.coordinates()
+        
+        # day, date, hour = curr_loc.time_stamp()
+        # lat, long = curr_loc.coordinates()
+        
 
+        
+        lat, long = curr_loc.coordinates()
+        temprature,elevation = curr_loc.temprature_data(lat,long)
         data, counter1 = {}, []
         coord_y_line1, offset = 700, 40
         width, height = {}, {}
@@ -476,8 +538,6 @@ class Page1(ctk.CTkFrame):
             nonlocal count
             nonlocal cap
             nonlocal model
-
-            
 
             if self.stopped:
                 cap.release()
@@ -509,6 +569,7 @@ class Page1(ctk.CTkFrame):
             for bbox in bbox_id:
                 
                 
+                
                 x3, y3, x4, y4, id = bbox
                 cx, cy = int(x3 + x4) // 2, int(y3 + y4) // 2
                 cv2.circle(frame, (cx, cy), 2, (255, 0, 255), -1)
@@ -517,6 +578,10 @@ class Page1(ctk.CTkFrame):
                     cv2.rectangle(frame, (x3, y3), (x4, y4), (0, 255, 0), 5)
                     cvzone.putTextRect(frame, f'id: {id} {c}', (x3, y3), 1, 1)
                     if counter1.count(id) == 0:
+
+                        day, date, hour = curr_loc.time_stamp()
+                        
+                        
                         
                         width = round((x2 - x1) * 0.1949152542, 2)  # predict width
                         height = round((y2 - y1) * 0.11392405, 2)  # predict height
@@ -537,26 +602,34 @@ class Page1(ctk.CTkFrame):
                             'Date': date,
                             'Time': hour,
                             'Width': width,
-                            'height': height
+                            'height': height,
+                            'Elevation' : elevation,
+                            "temprature" : temprature
                         }
 
             
+            self.latitude.configure(text=f'Latitude\t\t = {lat} °E')
+            self.longitude.configure(text=f'Longitude\t\t = {long} °N')
 
             cv2.line(frame, (3, coord_y_line1), (1920, coord_y_line1), (0, 225, 225), 5)
 
-            # cv2.putText(frame, text=f'Total Pothole = {len(counter1)}', org=(30, 450),
-            #             fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=0.7,
-            #             color=(0, 255, 0), thickness=1)
+            cv2.putText(frame, text=f'Temp = {len(counter1)}', org=(30, 450),
+                        fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=0.7,
+                        color=(0, 255, 0), thickness=1)
             
-            self.latitude.configure(text=f'{len(counter1)}')
+            self.counter_pothole.configure(text=f'{len(counter1)}')
+            self.altimeter.configure(text=f"Altitude\t\t = {elevation} m asl")
+            self.suhu.configure(text=f"temperature\t = {round(temprature,2)} °C")
 
             cv2.putText(frame, text='Screening Line', org=(10, 600),
                         fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=1,
                         color=(0, 255, 0), thickness=2)
 
-            cv2.putText(frame, text=f'Loc = {lat, long}', org=(10, 380),
-                        fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=0.5,
-                        color=(0, 255, 0), thickness=1)
+            # cv2.putText(frame, text=f'Loc = {lat, long}', org=(10, 380),
+            #             fontFace=cv2.FONT_HERSHEY_TRIPLEX, fontScale=0.5,
+            #             color=(0, 255, 0), thickness=1)
+
+            
 
             # Convert the frame to RGB format
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -567,12 +640,20 @@ class Page1(ctk.CTkFrame):
 
             self.videobox.after(10, update_frame)
 
-            
+           
         
         if not self.stopped:
-            update_frame()
+            threading.Thread(target=update_frame).start()
+    
+    
 
     def on_stop(self):
+
+        if self.is_running:
+            self.is_running = False
+            self.elapsed_time = timedelta()
+            self.time_var.set(self.format_time(self.elapsed_time))
+
         self.file_input.configure(state="normal")
         self.manual_input.configure(state="normal")
         self.folderinput.configure(state="normal")
@@ -580,7 +661,11 @@ class Page1(ctk.CTkFrame):
         self.checkbox1.configure(state="normal")
         self.checkbox2.configure(state="normal")
         self.folder_file_name.configure(state="normal")
-        self.latitude.configure(text='0')
+        self.counter_pothole.configure(text='0')
+        self.latitude.configure(text='Latitude\t\t = - °E')
+        self.longitude.configure(text='Longitude\t\t = - °N')
+        self.altimeter.configure(text=f"Altitude\t\t = - m asl")
+        self.suhu.configure(text=f"temperature\t = - °C")
 
     def stop_detection(self):
         self.stopped = True
@@ -589,7 +674,7 @@ class Page1(ctk.CTkFrame):
 
         if self.data:
             df = pd.DataFrame.from_dict(self.data, orient='index')
-            csv_filename = os.path.join(str(self.foldername), f'{str(self.folder_file_name.get(1.0, "end-1c"))}')
+            csv_filename = os.path.join(str(self.foldername), f'{self.folder_file_name.get()}'+'.csv')
             df.to_csv(csv_filename, index_label='ID')
             success_message = f'Data saved to {csv_filename}'
             CTkMessagebox(self, title="Success", message=success_message, height=200, width=400, icon="info",
@@ -695,6 +780,6 @@ if __name__ == "__main__":
     app.resizable(False,False)
     app.iconbitmap('app_asset/tool3_122846.ico')
     
-    
+    run_all_functions()
     app.mainloop()
 

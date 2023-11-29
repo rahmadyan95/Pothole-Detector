@@ -4,33 +4,24 @@ import geocoder as geo
 import datetime
 import os
 import requests
+import openmeteo_requests
+import requests_cache
+import pandas as pd
+from retry_requests import retry
+import threading
 # from dotenv import load_dotenv
 
 def coordinates():
-    location = geo.ip('me')
-    latitude = location.latlng[0]
-    longitude = location.latlng[1]
+    # location = geo.ip('me')
+    # latitude = location.latlng[0]
+    # longitude = location.latlng[1]
+
+    latitude = -6.9222
+    longitude = 107.6069
+
 
     return latitude, longitude
 
-
-
-# def weather_handle (lat,lon):
-#     load_dotenv()
-#     API_key = "873520d2e45976e64f92a6b5b0782484"#os.getenv("OPENWEATHER_API_KEY")
-#     url = f'http://api.openweathermap.org/geo/1.0/reverse?lat={lat}&lon={lon}&appid={API_key}'
-#     response = requests.get(url)
-#     print(response)
-
-    
-#     # data = response.json()
-#     # temp = data['main']['temp']
-#     # humid = data['main']['humidity']
-
-#     # print(f'Suhu: {temp}°C')
-#     # print(f'Kelembaban: {humid}%')
-#     #     #print(f'Kondisi Cuaca: {weather_description}'
-    
 
 def time_stamp ():
     x = datetime.datetime.now()
@@ -41,11 +32,59 @@ def time_stamp ():
 
     return day,date,hour 
 
+def temprature_data(lat,long):
+  
+
+    # Setup the Open-Meteo API client with cache and retry on error
+    cache_session = requests_cache.CachedSession('.cache', expire_after = 3600)
+    retry_session = retry(cache_session, retries = 5, backoff_factor = 0.2)
+    openmeteo = openmeteo_requests.Client(session = retry_session)
+
+    # Make sure all required weather variables are listed here
+    # The order of variables in hourly or daily is important to assign them correctly below
+    url = "https://api.open-meteo.com/v1/forecast"
+    params = {
+        "latitude": lat,
+        "longitude": long,
+        "current": "temperature_2m",
+        "hourly": "temperature_2m"
+    }
+    responses = openmeteo.weather_api(url, params=params)
+
+    # Process first location. Add a for-loop for multiple locations or weather models
+    response = responses[0]
+    # print(f"Coordinates {response.Latitude()}°E {response.Longitude()}°N")
+    # print(f"Elevation {response.Elevation()} m asl")
+
+    elevation = response.Elevation()
+
+
+    current = response.Current()
+    current_temperature_2m = current.Variables(0).Value()
+
+    # print(f"Current time {current.Time()}")
+    # print(f"Current temperature_2m {current_temperature_2m}")
+
+    return current_temperature_2m,elevation
+
+def run_all_functions():
+    coordinates_thread = threading.Thread(target=coordinates)
+    time_stamp_thread = threading.Thread(target=time_stamp)
+    temperature_data_thread = threading.Thread(target=temprature_data, args=coordinates())
+
+    coordinates_thread.start()
+    time_stamp_thread.start()
+    temperature_data_thread.start()
+
+    coordinates_thread.join()
+    time_stamp_thread.join()
+    temperature_data_thread.join()
+
+if __name__ == "__main__":
+    run_all_functions()
 
 
 
-if __name__ == '__main__':
-#     #time_stamp()
-#     coordinates()
-    latitude, longitude = -6.9222,107.6069
+
+
     
