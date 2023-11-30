@@ -20,6 +20,8 @@ from CTkMessagebox import CTkMessagebox
 from datetime import timedelta 
 from datetime import timedelta
 from curr_loc import run_all_functions
+import ttkbootstrap as ttk
+import psutil
 
 
 class tkinterApp(ctk.CTk):
@@ -50,6 +52,7 @@ class tkinterApp(ctk.CTk):
 class StartPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
         super().__init__(parent)
+        
         
         custom_font = font.Font(family="Bahnschrift SemiBold SemiConden",size=100, weight="bold")
 
@@ -115,20 +118,30 @@ class StartPage(ctk.CTkFrame):
         image_home = CTkLabel(self,image=imagehome,text='',bg_color='grey20',width=100, height=100)
         image_home.place(x=-12,y=45)
         
-
-        side_background = Canvas(self, width=1250, height= 940, background="grey", highlightthickness=0)
-        side_background.place(x=1250,y=400)
+        # RIGHT SIDE BOX ======================================================================================
+        side_background = CTkLabel(self, width=640, height= 468, bg_color="grey",corner_radius=8, text='')
+        side_background.place(x=620,y=200)
 
         title_side = CTkLabel(self,text="SYSTEM INFORMATION", font=("Bahnschrift SemiBold SemiConden",18),text_color="grey10",bg_color="grey")
         title_side.place(x=865, y=220)
 
+        self.ram_status = CTkLabel(side_background,width=150,height=200,bg_color="grey30",text='')
+        self.ram_status.place(x=30,y=60)
+
+        self.ram_number = CTkLabel(self.ram_status,width=130,height=150,bg_color="grey10",text='',text_color="white",
+                                   font=("Bahnschrift SemiBold SemiConden",18))
+        self.ram_number.place(x=10,y=40)
+
+        
+
+
+
+        #============================= Untuk memasukan Foto ==================================================== #
         camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\map.png')
         imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(55,55))
         image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey10',width=100, height=100)
         image_camera.place(x=-12,y=260)
 
-
-        #============================= Untuk memasukan Foto ==================================================== #
         image_path = os.path.join(os.path.dirname(__file__), 'app_asset\construction.png')
         image = CTkImage(light_image=Image.open(image_path), size=(90,90))
         image_label = CTkLabel(self,image=image,text='',bg_color='grey20')
@@ -148,6 +161,17 @@ class StartPage(ctk.CTkFrame):
         imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(55,55))
         image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey10',width=100, height=100)
         image_camera.place(x=-12,y=370)
+
+        self.update_meter()
+
+
+
+    def update_meter(self):
+        virtual_memory = psutil.virtual_memory()
+        percent_used = virtual_memory.percent
+        self.ram_number.configure(text=f'{percent_used}')
+        self.ram_number.after(1000, self.update_meter)
+        
 
 
 class Page1(ctk.CTkFrame):
@@ -375,8 +399,8 @@ class Page1(ctk.CTkFrame):
                                          placeholder_text="",text_color="white")
         self.folder_file_name.place(x=9 ,y= 87)
 
-        self.folder_name = CTkLabel(select_folder, text_color='white',font=("Bahnschrift SemiBold SemiConden",13),text="Input name for folder and data file",bg_color='transparent',)
-        self.folder_name.place(x=10,y=58)
+        self.nameinputfolder = CTkLabel(select_folder, text_color='white',font=("Bahnschrift SemiBold SemiConden",13),text="Input name for folder and data file",bg_color='transparent',)
+        self.nameinputfolder.place(x=10,y=58)
 
     # Format Time ============================================
     def update_time(self):
