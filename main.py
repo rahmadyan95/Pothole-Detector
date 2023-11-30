@@ -125,12 +125,55 @@ class StartPage(ctk.CTkFrame):
         title_side = CTkLabel(self,text="SYSTEM INFORMATION", font=("Bahnschrift SemiBold SemiConden",18),text_color="grey10",bg_color="grey")
         title_side.place(x=865, y=220)
 
+        # RAM Status ===========================================================================================
         self.ram_status = CTkLabel(side_background,width=150,height=200,bg_color="grey30",text='')
-        self.ram_status.place(x=30,y=60)
+        self.ram_status.place(x=20,y=60)
+
+        self.ram_status_title = CTkLabel(self.ram_status,bg_color="grey30",text='RAM Usage', font=("Bahnschrift SemiBold SemiConden",18))
+        self.ram_status_title.place(x=36,y=5)
 
         self.ram_number = CTkLabel(self.ram_status,width=130,height=150,bg_color="grey10",text='',text_color="white",
-                                   font=("Bahnschrift SemiBold SemiConden",18))
+                                   font=("Bahnschrift SemiBold SemiConden",35))
         self.ram_number.place(x=10,y=40)
+
+
+        # GPU STATUS ===============================================================================================
+
+        self.GPU_status = CTkLabel(side_background,width=440,height=200,bg_color="grey30",text='')
+        self.GPU_status.place(x=180,y=60)
+
+        self.GPU_status_title = CTkLabel(self.GPU_status,bg_color="grey30",text='Graphical Processing Unit Information', font=("Bahnschrift SemiBold SemiConden",18))
+        self.GPU_status_title.place(x=85,y=5)
+
+        self.GPU_device_name = CTkLabel(self.GPU_status,width=230,height=45,bg_color="grey10",text='GPU Name',text_color="white",
+                                   font=("Bahnschrift SemiBold SemiConden",18))
+        self.GPU_device_name.place(x=10,y=40)
+
+        self.gpu_presentage = CTkLabel(self.GPU_status,width=230,height=95,bg_color="grey10",text='',text_color="white",
+                                   font=("Bahnschrift SemiBold SemiConden",35))
+        self.gpu_presentage.place(x=10,y=90)
+
+        # GPU NAME 
+        self.GPU_load = CTkLabel(self.GPU_status,width=90,height=45,bg_color="grey10",text='GPU Load',text_color="white",
+                                   font=("Bahnschrift SemiBold SemiConden",16))
+        self.GPU_load.place(x=245,y=40)
+
+        self.GpuLoadName = CTkLabel(self.GPU_status,width=90,height=95,bg_color="grey10",text='',text_color="white",
+                                   font=("Bahnschrift SemiBold SemiConden",35))
+        self.GpuLoadName.place(x=245,y=90)
+
+        # GPU 
+        self.GPU_Vram = CTkLabel(self.GPU_status,width=90,height=45,bg_color="grey10",text='VRAM Usage',text_color="white",
+                                   font=("Bahnschrift SemiBold SemiConden",14))
+        self.GPU_Vram.place(x=340,y=40)
+
+        self.GPUVRAMNAME = CTkLabel(self.GPU_status,width=90,height=95,bg_color="grey10",text='',text_color="white",
+                                   font=("Bahnschrift SemiBold SemiConden",35))
+        self.GPUVRAMNAME.place(x=340,y=90)
+
+
+
+        
 
         
 
@@ -164,12 +207,10 @@ class StartPage(ctk.CTkFrame):
 
         self.update_meter()
 
-
-
     def update_meter(self):
         virtual_memory = psutil.virtual_memory()
         percent_used = virtual_memory.percent
-        self.ram_number.configure(text=f'{percent_used}')
+        self.ram_number.configure(text=f'{percent_used} %')
         self.ram_number.after(1000, self.update_meter)
         
 
@@ -501,7 +542,7 @@ class Page1(ctk.CTkFrame):
         self.checkbox2.configure(state="disabled")
         self.folder_file_name.configure(state="disabled")
     
-    
+
     def start_detection_thread(self):
         detection_thread = threading.Thread(target=self.start_detection)
         detection_thread.start()
