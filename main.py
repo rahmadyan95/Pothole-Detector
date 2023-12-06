@@ -1,5 +1,6 @@
 # import tkinter as tk
 # from tkinter import ttk
+import socket
 import customtkinter as ctk
 from customtkinter import*
 # from tkinter import*
@@ -14,15 +15,14 @@ import cvzone
 import curr_loc as curr_loc
 import os
 import datetime
-import threading
 from customtkinter import filedialog, BooleanVar
 from CTkMessagebox import CTkMessagebox
 from datetime import timedelta 
 from datetime import timedelta
-from curr_loc import run_all_functions
 import ttkbootstrap as ttk
 import psutil
-
+import GPUtil
+import tkintermapview as tkmap
 
 class tkinterApp(ctk.CTk):
     def __init__(self, *args, **kwargs):
@@ -48,12 +48,15 @@ class tkinterApp(ctk.CTk):
     def show_frame(self, cont):
         frame = self.frames[cont]
         frame.tkraise()
-
+            
+        
+        
 class StartPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         
         
+        self.updating_meter = False
         custom_font = font.Font(family="Bahnschrift SemiBold SemiConden",size=100, weight="bold")
 
         side_bar = CTkCanvas(self, width=150,
@@ -71,7 +74,8 @@ class StartPage(ctk.CTkFrame):
 
         #Detection Button
 
-        kamera_image = PhotoImage(file=r".\app_asset\kamera.png").subsample(3,3)
+        self.script_dir = os.path.dirname(os.path.abspath(__file__))
+        kamera_image = CTkImage(light_image=Image.open(os.path.join(self.script_dir, 'app_asset', 'kamera.png')),size=(80,80))
         page1_button = CTkButton(self, width=500, 
                           height=150, text='DETECT POTHOLE',
                           fg_color='grey', text_color='grey10',
@@ -83,7 +87,7 @@ class StartPage(ctk.CTkFrame):
         page1_button.place(x=100,y=200)
 
         
-        image_path1 = os.path.join(os.path.dirname(__file__), 'app_asset\maps.png')
+        image_path1 = os.path.join(self.script_dir, 'app_asset', 'maps.png')
         image1 = CTkImage(light_image=Image.open(image_path1), size=(90,90))
         page2 = CTkButton(self, width=500, 
                           height=150, text='  SHOW MAPS',
@@ -99,7 +103,7 @@ class StartPage(ctk.CTkFrame):
         # image_label1 = CTkLabel(page2,image=image1,text='',bg_color='grey20')
         # image_label1.place(x=1000)
 
-        image_path2 = os.path.join(os.path.dirname(__file__), 'app_asset\document.png')
+        image_path2 = image_path1 = os.path.join(self.script_dir, 'app_asset', 'document.png')
         image2 = CTkImage(light_image=Image.open(image_path2), size=(90,90))
 
         page3 = CTkButton(self, width=500, 
@@ -113,7 +117,7 @@ class StartPage(ctk.CTkFrame):
                           )
         page3.place(x=100,y=520)
 
-        image_home = os.path.join(os.path.dirname(__file__), 'app_asset\home.png')
+        image_home = os.path.join(self.script_dir, 'app_asset', 'home.png')
         imagehome = CTkImage(light_image=Image.open(image_home), size=(45,45))
         image_home = CTkLabel(self,image=imagehome,text='',bg_color='grey20',width=100, height=100)
         image_home.place(x=-12,y=45)
@@ -149,9 +153,9 @@ class StartPage(ctk.CTkFrame):
                                    font=("Bahnschrift SemiBold SemiConden",18))
         self.GPU_device_name.place(x=10,y=40)
 
-        self.gpu_presentage = CTkLabel(self.GPU_status,width=230,height=95,bg_color="grey10",text='',text_color="white",
-                                   font=("Bahnschrift SemiBold SemiConden",35))
-        self.gpu_presentage.place(x=10,y=90)
+        self.gpu_name = CTkLabel(self.GPU_status,width=230,height=95,bg_color="grey10",text='',text_color="white",
+                                   font=("Bahnschrift SemiBold SemiConden",14))
+        self.gpu_name.place(x=10,y=90)
 
         # GPU NAME 
         self.GPU_load = CTkLabel(self.GPU_status,width=90,height=45,bg_color="grey10",text='GPU Load',text_color="white",
@@ -175,17 +179,15 @@ class StartPage(ctk.CTkFrame):
 
         
 
-        
-
 
 
         #============================= Untuk memasukan Foto ==================================================== #
-        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\map.png')
+        camera_logo_path = os.path.join(self.script_dir, 'app_asset', 'map.png')
         imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(55,55))
         image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey10',width=100, height=100)
         image_camera.place(x=-12,y=260)
 
-        image_path = os.path.join(os.path.dirname(__file__), 'app_asset\construction.png')
+        image_path = os.path.join(self.script_dir, 'app_asset', 'construction.png')
         image = CTkImage(light_image=Image.open(image_path), size=(90,90))
         image_label = CTkLabel(self,image=image,text='',bg_color='grey20')
         image_label.place(x=375,y=20)
@@ -195,30 +197,109 @@ class StartPage(ctk.CTkFrame):
         title_side = CTkLabel(self,text="Beta Ver0.01.05", font=("Bahnschrift SemiBold SemiConden",12),text_color="grey",bg_color="grey20")
         title_side.place(x=1190, y=680)
 
-        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\kamera2.png')
+        camera_logo_path = os.path.join(self.script_dir, 'app_asset', 'kamera2.png')
         imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(45,45))
         image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey10',width=100, height=100)
         image_camera.place(x=-12,y=150)
 
-        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\document1.png')
+        camera_logo_path = os.path.join(self.script_dir, 'app_asset', 'document1.png')
         imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(55,55))
         image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey10',width=100, height=100)
         image_camera.place(x=-12,y=370)
 
-        self.update_meter()
+        # self.update_meter()
 
-    def update_meter(self):
+
+
+        # OUTDORR STATUS =====================================
+        
+
+        main_outdoor_box = CTkLabel(side_background,height=180, width=600,bg_color="grey30", text='')
+        main_outdoor_box.place(x=20, y=270)
+        self.outdoor_title = CTkLabel(main_outdoor_box,bg_color="grey30",text='Enviroment Status', font=("Bahnschrift SemiBold SemiConden",18))
+        self.outdoor_title.place(x=230,y=6)
+
+        # Weather
+        self.weather = CTkLabel(main_outdoor_box,width=130,height=40,bg_color="grey10",text='Temperature',text_color="white",
+                                   font=("Bahnschrift SemiBold SemiConden",16))
+        self.weather.place(x=20,y=40)
+
+        self.weather_value = CTkLabel(main_outdoor_box,width=130,height=80,bg_color="grey10",text='',text_color="white",
+                                   font=("Bahnschrift SemiBold SemiConden",35))
+        self.weather_value.place(x=20,y=85)
+
+        # Latitdue BOX
+        self.latitude_box = CTkLabel(main_outdoor_box,width=130,height=40,bg_color="grey10",text='Latitude',text_color="white",
+                                   font=("Bahnschrift SemiBold SemiConden",16))
+        self.latitude_box.place(x=165,y=40)
+
+        self.latitude_value = CTkLabel(main_outdoor_box,width=130,height=80,bg_color="grey10",text='',text_color="white",
+                                   font=("Bahnschrift SemiBold SemiConden",35))
+        self.latitude_value.place(x=165,y=85)
+        
+        # Longitude box
+        self.longitude_box = CTkLabel(main_outdoor_box,width=130,height=40,bg_color="grey10",text='Longitude',text_color="white",
+                                   font=("Bahnschrift SemiBold SemiConden",16))
+        self.longitude_box.place(x=307,y=40)
+
+        self.longitude_value = CTkLabel(main_outdoor_box,width=130,height=80,bg_color="grey10",text='',text_color="white",
+                                   font=("Bahnschrift SemiBold SemiConden",35))
+        self.longitude_value.place(x=307,y=85)
+
+        # altitude box
+        self.altitude_box = CTkLabel(main_outdoor_box,width=130,height=40,bg_color="grey10",text='Altitude',text_color="white",
+                                   font=("Bahnschrift SemiBold SemiConden",16))
+        self.altitude_box.place(x=450,y=40)
+
+        self.altitude_value = CTkLabel(main_outdoor_box,width=130,height=80,bg_color="grey10",text='',text_color="white",
+                                   font=("Bahnschrift SemiBold SemiConden",35))
+        self.altitude_value.place(x=450,y=85)
+
+        self.update_ram_used()
+        self.update_gpu_name()
+        self.gpu_persentage()
+        self.gpu_used()
+        
+        
+    
+
+    def update_ram_used(self):
+        
         virtual_memory = psutil.virtual_memory()
         percent_used = virtual_memory.percent
         self.ram_number.configure(text=f'{percent_used} %')
-        self.ram_number.after(1000, self.update_meter)
         
+        self.ram_number.after(1010, self.update_ram_used)
+            
+    def update_gpu_name(self):
+        gpu = GPUtil.getGPUs()
+        namagpu = gpu[0].name  
+        self.gpu_name.configure(text=f'{namagpu}')
+        
+
+    def gpu_persentage(self):
+        gpu = GPUtil.getGPUs()
+        used_persentage = gpu[0].load * 100
+        self.GpuLoadName.configure(text=f'{used_persentage} %')
+        self.GpuLoadName.after(1020,self.gpu_persentage)
+        
+    def gpu_used(self):
+        gpu = GPUtil.getGPUs()
+        vram_used = gpu[0].memoryUsed
+        vram_total = gpu[0].memoryTotal
+        persentase_vram_used = (vram_used / vram_total) * 100
+        self.GPUVRAMNAME.configure(text=f'{round(persentase_vram_used, 2)} %')
+        self.GPUVRAMNAME.after(1040,self.gpu_used)
+
+
 
 
 class Page1(ctk.CTkFrame):
     def __init__(self, parent, controller):
         super().__init__(parent)
+        self.script_dir = os.path.dirname(os.path.abspath(__file__))
 
+        # self.__data1 = VideoData()
         
 
         self.is_running = False 
@@ -236,7 +317,7 @@ class Page1(ctk.CTkFrame):
                                     )
         side_bar.pack(side=tk.LEFT, fill=tk.Y)
 
-        image_home = os.path.join(os.path.dirname(__file__), 'app_asset\home.png')
+        image_home = os.path.join(self.script_dir, 'app_asset', 'home.png')
         imagehome = CTkImage(light_image=Image.open(image_home), size=(45,45))
         # image_home = CTkLabel(self,image=imagehome,text='',bg_color='grey10',height=100)
         # image_home.place(x=12,y=50)
@@ -254,17 +335,17 @@ class Page1(ctk.CTkFrame):
                           )
         page3.place(x=0,y=45)
 
-        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\kamera2.png')
+        camera_logo_path = os.path.join(self.script_dir, 'app_asset', 'kamera2.png')
         imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(45,45))
         image_camera = CTkLabel(self,image=imagehome,text='',bg_color='grey20',width=100, height=100)
         image_camera.place(x=-12,y=150)
 
-        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\map.png')
+        camera_logo_path = os.path.join(self.script_dir, 'app_asset', 'map.png')
         imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(55,55))
         image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey10',width=100, height=100)
         image_camera.place(x=-12,y=260)
 
-        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\document1.png')
+        camera_logo_path = os.path.join(self.script_dir, 'app_asset', 'document1.png')
         imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(55,55))
         image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey10',width=100, height=100)
         image_camera.place(x=-12,y=370)
@@ -378,11 +459,11 @@ class Page1(ctk.CTkFrame):
         self.file_input.place(x=10, y=35)
         self.file_input.configure(state="disabled")
 
-        play_logo = os.path.join(os.path.dirname(__file__), 'app_asset\play.png')
+        play_logo = os.path.join(self.script_dir, 'app_asset', 'play.png')
         imagelogo = CTkImage(light_image=Image.open(play_logo), size=(45,45))
         start_button = CTkButton(playbox, 
                                  text='START DETECTION',
-                                 command=(self.start_detection_thread),
+                                 command=(self.start_detection),
                                  fg_color='grey30',
                                  hover_color="#228B22",
                                  width=180,
@@ -392,7 +473,7 @@ class Page1(ctk.CTkFrame):
                                  )
         start_button.place(x=10, y=35)
 
-        stop_logo = os.path.join(os.path.dirname(__file__), 'app_asset\stop2.png')
+        stop_logo = os.path.join(self.script_dir, 'app_asset', 'stop2.png')
         imagestop = CTkImage(light_image=Image.open(stop_logo), size=(45,45))
         stop_button = CTkButton(playbox, 
                                  text='STOP DETECTION',
@@ -442,6 +523,10 @@ class Page1(ctk.CTkFrame):
 
         self.nameinputfolder = CTkLabel(select_folder, text_color='white',font=("Bahnschrift SemiBold SemiConden",13),text="Input name for folder and data file",bg_color='transparent',)
         self.nameinputfolder.place(x=10,y=58)
+
+
+        # Outdoor status 
+        
 
     # Format Time ============================================
     def update_time(self):
@@ -494,7 +579,7 @@ class Page1(ctk.CTkFrame):
 
         self.filename = filedialog.askopenfilename(
             title='Open a file',
-            initialdir='/',
+            initialdir=self.script_dir,
             filetypes=filetypes
             )
         
@@ -507,7 +592,7 @@ class Page1(ctk.CTkFrame):
         self.foldername_var = StringVar()
 
         self.foldername = filedialog.askdirectory(title="Select Folder to Save",
-                                                  initialdir='/')
+                                                  initialdir=self.script_dir)
         
         self.foldername_var.set(os.path.basename(self.foldername))
         self.folder_name.configure(text=f"Path : {self.foldername_var.get()}")
@@ -543,12 +628,6 @@ class Page1(ctk.CTkFrame):
         self.folder_file_name.configure(state="disabled")
     
 
-    def start_detection_thread(self):
-        detection_thread = threading.Thread(target=self.start_detection)
-        detection_thread.start()
-
-
-
     def start_detection(self):
 
         input_content = self.folder_file_name
@@ -562,14 +641,16 @@ class Page1(ctk.CTkFrame):
         self.on_start()
         
         self.stopped = False
-        model = YOLO('custom.pt')
-        # cap = cv2.VideoCapture("test2.mp4")
+        model = YOLO(os.path.join(self.script_dir, 'custom.pt'))
+        # self.cap = cv2.VideoCapture("test2.mp4")
 
         try :
             if self.checkbox_var.get():
                 cap = cv2.VideoCapture(self.filename)
+               
             else:
                 cap = cv2.VideoCapture(int(self.manual_input.get(1.0, "end-1c")))
+             
 
         except Exception as e :
             error_message = "Video Source Is Empty"
@@ -577,7 +658,7 @@ class Page1(ctk.CTkFrame):
                           font=("Bahnschrift SemiBold SemiConden",14))
             return
             
-        my_file = open('coco.txt', "r")
+        my_file = open(os.path.join(self.script_dir, 'coco.txt'), "r")
         data = my_file.read()
         class_list = data.split("\n")
 
@@ -604,7 +685,7 @@ class Page1(ctk.CTkFrame):
             nonlocal cap
             nonlocal model
 
-            if self.stopped:
+            if self.stopped == True:
                 cap.release()
                 return
             
@@ -696,11 +777,8 @@ class Page1(ctk.CTkFrame):
 
             
 
-            # Convert the frame to RGB format
             rgb_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            # Convert the NumPy array to a PhotoImage object
-            self.photo = ImageTk.PhotoImage(Image.fromarray(rgb_frame))
-            # Update the videobox canvas with the new image
+            self.photo =  ImageTk.PhotoImage(image=Image.fromarray(rgb_frame))
             self.videobox.create_image(0, 0, anchor=tk.NW, image=self.photo)
 
             self.videobox.after(10, update_frame)
@@ -708,8 +786,7 @@ class Page1(ctk.CTkFrame):
            
         
         if not self.stopped:
-            threading.Thread(target=update_frame).start()
-    
+            self.videobox.after(10, update_frame)
     
 
     def on_stop(self):
@@ -733,6 +810,7 @@ class Page1(ctk.CTkFrame):
         self.suhu.configure(text=f"temperature\t = - °C")
 
     def stop_detection(self):
+
         self.stopped = True
         self.videobox.delete("all")
         self.on_stop()
@@ -752,6 +830,8 @@ class Page2(ctk.CTkFrame):
     def __init__(self, parent, controller):
         super().__init__(parent)
 
+
+        self.script_dir = os.path.dirname(os.path.abspath(__file__))
         side_bar = CTkCanvas(self, width=150,
                                     height=1100, 
                                     bg="gray10",
@@ -759,7 +839,7 @@ class Page2(ctk.CTkFrame):
                                     )
         side_bar.pack(side=tk.LEFT, fill=tk.Y)
 
-        image_home = os.path.join(os.path.dirname(__file__), 'app_asset\home.png')
+        image_home = os.path.join(self.script_dir, 'app_asset', 'home.png')
         imagehome = CTkImage(light_image=Image.open(image_home), size=(45,45))
         # image_home = CTkLabel(self,image=imagehome,text='',bg_color='grey10',height=100)
         # image_home.place(x=12,y=50)
@@ -777,25 +857,86 @@ class Page2(ctk.CTkFrame):
                           )
         page3.place(x=0,y=45)
 
-        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\kamera2.png')
+       
+
+
+        camera_logo_path = os.path.join(self.script_dir, 'app_asset', 'kamera2.png')
         imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(45,45))
         image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey10',width=100, height=100)
         image_camera.place(x=-12,y=150)
 
-        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\map.png')
+        camera_logo_path = os.path.join(self.script_dir, 'app_asset', 'map.png')
         imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(55,55))
         image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey20',width=100, height=100)
         image_camera.place(x=-12,y=260)
 
-        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\document1.png')
+        camera_logo_path = os.path.join(self.script_dir, 'app_asset', 'document1.png')
         imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(55,55))
         image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey10',width=100, height=100)
         image_camera.place(x=-12,y=370)
+
+
+
+        #  MAP SEGMENTATION ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+        sidebox = CTkLabel(self,height=695, width=210,text="",bg_color="grey10")
+        sidebox.place(x=1060, y = 10)
         
+        # JUDUL KOTAK SAMPING
+        title_sidebox = CTkLabel(sidebox,bg_color="grey10",text='Video Data',font=("Bahnschrift SemiBold SemiConden",16),text_color='white')
+        title_sidebox.place(x=74, y = 5)
+
+
+        startMap_Button = CTkButton(sidebox,height=20,width=50, text="click me",command=self.start_map)
+        startMap_Button.place(x=10,y=10)
+        startMap_Button = CTkButton(sidebox,height=20,width=50, text="stop me",command=self.stop_map)
+        startMap_Button.place(x=10,y=50)
+
+        self.map_containter = CTkLabel(self,width=960,height=695,text="Click Start to show map",bg_color="grey10",text_color="white")
+        self.map_containter.place(x=90,y=12)
+
+        choose_csv = CTkButton(sidebox,height=20,width=50, 
+                               text="select csv",
+                               command=self.select_csv)
+        choose_csv.place(x=10,y=80)
+
+
+
+    def start_map(self):
+        self.after(2000,self.map_handler)
+
+        # self.map_handler()
+
+    def stop_map(self):
+        self.map_widget.destroy()
+
+
+    def map_handler(self):
+        self.map_widget = tkmap.TkinterMapView(self.map_containter,width=1890,height=1360)
+        self.map_widget.place(x=15,y=15)
+        self.map_widget.set_position(-6.9203, 107.6232,marker=True)
+    
+    def select_csv(self):
+
+        self.filename_var = tk.StringVar()
+
+        filetypes = (('CSV files', '*.csv'), 
+                     ('All files', '*.*'))
+
+        self.filename = filedialog.askopenfilename(
+            title='Open a file',
+            initialdir=self.script_dir,
+            filetypes=filetypes
+            )
+        
+        self.filename_var.set(os.path.basename(self.filename))
+        print(self.filename_var)
+
 
 class Page3(ctk.CTkFrame):
     def __init__(self, parent, controller):
         super().__init__(parent)
+        self.script_dir = os.path.dirname(os.path.abspath(__file__))
         side_bar = CTkCanvas(self, width=150,
                                     height=1100, 
                                     bg="gray10",
@@ -803,7 +944,7 @@ class Page3(ctk.CTkFrame):
                                     )
         side_bar.pack(side=tk.LEFT, fill=tk.Y)
 
-        image_home = os.path.join(os.path.dirname(__file__), 'app_asset\home.png')
+        image_home = os.path.join(self.script_dir, 'app_asset', 'home.png')
         imagehome = CTkImage(light_image=Image.open(image_home), size=(45,45))
         # image_home = CTkLabel(self,image=imagehome,text='',bg_color='grey10',height=100)
         # image_home.place(x=12,y=50)
@@ -821,30 +962,35 @@ class Page3(ctk.CTkFrame):
                           )
         page3.place(x=0,y=45)
 
-        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\kamera2.png')
+        camera_logo_path = os.path.join(self.script_dir, 'app_asset', 'kamera2.png')
         imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(45,45))
         image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey10',width=100, height=100)
         image_camera.place(x=-12,y=150)
 
-        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\map.png')
+        camera_logo_path = os.path.join(self.script_dir, 'app_asset', 'map.png')
         imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(55,55))
         image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey10',width=100, height=100)
         image_camera.place(x=-12,y=260)
 
-        camera_logo_path = os.path.join(os.path.dirname(__file__), 'app_asset\document1.png')
+        camera_logo_path = os.path.join(self.script_dir, 'app_asset', 'document1.png')
         imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(55,55))
         image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey20',width=100, height=100)
         image_camera.place(x=-12,y=370)
 
 
 
+        
+
+    
+
 if __name__ == "__main__":
+    
+    script_dir = os.path.dirname(os.path.abspath(__file__))
     app = tkinterApp()
     app.title('Pothole Detector')
     app.geometry("1280x720")
     app.resizable(False,False)
-    app.iconbitmap('app_asset/tool3_122846.ico')
+    app.iconbitmap(os.path.join(script_dir, 'app_asset', 'hat.ico'))
     
-    run_all_functions()
     app.mainloop()
 
