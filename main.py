@@ -23,6 +23,7 @@ import ttkbootstrap as ttk
 import psutil
 import GPUtil
 import tkintermapview as tkmap
+import textwrap
 
 class tkinterApp(ctk.CTk):
     def __init__(self, *args, **kwargs):
@@ -713,9 +714,7 @@ class Page1(ctk.CTkFrame):
 
             bbox_id = tracker.update(pothole_list)
             for bbox in bbox_id:
-                
-                
-                
+                 
                 x3, y3, x4, y4, id = bbox
                 cx, cy = int(x3 + x4) // 2, int(y3 + y4) // 2
                 cv2.circle(frame, (cx, cy), 2, (255, 0, 255), -1)
@@ -858,8 +857,6 @@ class Page2(ctk.CTkFrame):
         page3.place(x=0,y=45)
 
        
-
-
         camera_logo_path = os.path.join(self.script_dir, 'app_asset', 'kamera2.png')
         imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(45,45))
         image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey10',width=100, height=100)
@@ -876,45 +873,211 @@ class Page2(ctk.CTkFrame):
         image_camera.place(x=-12,y=370)
 
 
-
-        #  MAP SEGMENTATION ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
+        # JUDUL KOTAK SAMPING 
         sidebox = CTkLabel(self,height=695, width=210,text="",bg_color="grey10")
         sidebox.place(x=1060, y = 10)
+
+        title_sidebox = CTkLabel(sidebox,bg_color="grey10",text='Map Configuration',font=("Bahnschrift SemiBold SemiConden",16),text_color='white')
+        title_sidebox.place(x=50, y = 5)
+
         
-        # JUDUL KOTAK SAMPING
-        title_sidebox = CTkLabel(sidebox,bg_color="grey10",text='Video Data',font=("Bahnschrift SemiBold SemiConden",16),text_color='white')
-        title_sidebox.place(x=74, y = 5)
+        box_file_hander_map_csv = CTkLabel(sidebox,bg_color="grey20",text='',width=200,height=170)
+        box_file_hander_map_csv.place(x=5, y = 45)
+
+        title_handler_map_csv = CTkLabel(box_file_hander_map_csv,bg_color="transparent",text='CSV Handler',font=("Bahnschrift SemiBold SemiConden",14))
+        title_handler_map_csv.place(x=65, y = 5)
 
 
-        startMap_Button = CTkButton(sidebox,height=20,width=50, text="click me",command=self.start_map)
-        startMap_Button.place(x=10,y=10)
-        startMap_Button = CTkButton(sidebox,height=20,width=50, text="stop me",command=self.stop_map)
-        startMap_Button.place(x=10,y=50)
-
+        
         self.map_containter = CTkLabel(self,width=960,height=695,text="Click Start to show map",bg_color="grey10",text_color="white")
         self.map_containter.place(x=90,y=12)
+    
+        #  MAP SEGMENTATION ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-        choose_csv = CTkButton(sidebox,height=20,width=50, 
-                               text="select csv",
+        title_handler_map_csv = CTkLabel(sidebox,bg_color="grey10",text='Start/Stop Showing Map',font=("Bahnschrift SemiBold SemiConden",14))
+        title_handler_map_csv.place(x=40, y = 230)
+
+
+        # START / STOP SHOWING MAP 
+        self.startMap_Button = CTkButton(sidebox,height=100,width=90, text="START",command=self.start_map,fg_color="#228B22",
+                                    hover_color="#fce101",font=("Bahnschrift SemiBold SemiConden",18))
+        self.startMap_Button.place(x=10,y=270)
+
+
+        self.stopMap_Button = CTkButton(sidebox,height=100,width=90, text="STOP",command=self.stop_map,fg_color="grey50",
+                                        hover_color="#fce101",font=("Bahnschrift SemiBold SemiConden",18))
+        self.stopMap_Button.place(x=110,y=270)
+        self.stopMap_Button.configure(state='disabled')
+
+
+        choose_csv = CTkButton(box_file_hander_map_csv,height=40,width=190, 
+                               text="Select CSV",
+                               fg_color="grey50",
+                               hover_color="#fce101",
+                               font=("Bahnschrift SemiBold SemiConden",16),
+                                text_color="grey10",
                                command=self.select_csv)
-        choose_csv.place(x=10,y=80)
+        choose_csv.place(x=5,y=40)
+
+        title_csv_path = CTkLabel(sidebox,bg_color="transparent",text='CSV Path',font=("Bahnschrift SemiBold SemiConden",12),text_color='white')
+        title_csv_path.place(x=12, y = 125)
+
+        self.csv_path = CTkButton(box_file_hander_map_csv,width=190,height=40,text='',fg_color="grey50",
+                                  font=("Bahnschrift SemiBold SemiConden",16),
+                                 state="disabled")
+        self.csv_path.place(x=5,y=110)
+
+        self.path_name = CTkLabel(self.csv_path,text="", font=("Bahnschrift SemiBold SemiConden",12),
+                                  text_color="grey10")
+        self.path_name.place(x=10,y=5)
+
+        # FIND DETAIL MAP DATA =======================================================================
+
+        title_detail_map = CTkLabel(sidebox,bg_color="grey10",text='Find Detail Point ID',font=("Bahnschrift SemiBold SemiConden",14))
+        title_detail_map.place(x=50, y = 390)
+
+        self.find_id = CTkEntry(sidebox,height=30,width=150,placeholder_text="input ID to find detail")
+        self.find_id.place(x=10 ,y=420)
+
+        search_logo_path = os.path.join(self.script_dir, 'app_asset', 'cari.png')
+        search_logo = CTkImage(light_image=Image.open(search_logo_path), size=(20,20))
+        find_button = CTkButton(sidebox,height=30,width=30,fg_color="grey50",font=("Bahnschrift SemiBold SemiConden",12),
+                                image=search_logo,text='',command=self.location_detail)
+        find_button.place(x=165, y=420)
+
+        self.ID_detail = CTkButton(sidebox,width=190,height=220,text='',fg_color="grey50",
+                                  font=("Bahnschrift SemiBold SemiConden",16),
+                                 state="disabled")
+        self.ID_detail.place(x=10,y=460)
+
+        
+
+        # ID DETAIL TEXT ==================================================
+
+        self.ID_value = CTkButton(self.ID_detail,width=185,height=35,text='-',fg_color="grey10",
+                                  font=("Bahnschrift SemiBold SemiConden",22),
+                                 state="disabled")
+        self.ID_value.place(x=2,y=2)
+        
+        self.day_value = CTkLabel(self.ID_detail,text="Day\t=", font=("Bahnschrift SemiBold SemiConden",14),height=14,
+                                  text_color="white",bg_color="transparent")
+        self.day_value.place(x=7,y=40)
+
+        self.time_value = CTkLabel(self.ID_detail,text="Time\t=", font=("Bahnschrift SemiBold SemiConden",14),height=14,
+                                  text_color="white",bg_color="transparent")
+        self.time_value.place(x=7,y=60)
+
+        self.width_value = CTkLabel(self.ID_detail,text="Width\t=", font=("Bahnschrift SemiBold SemiConden",14),height=14,
+                                  text_color="white",bg_color="transparent")
+        self.width_value.place(x=7,y=80)
+
+        self.lenght_value = CTkLabel(self.ID_detail,text="Lenght\t=", font=("Bahnschrift SemiBold SemiConden",14),height=14,
+                                  text_color="white",bg_color="transparent")
+        self.lenght_value.place(x=7,y=100)
+
+        self.latitude_value = CTkLabel(self.ID_detail,text="Lat\t=", font=("Bahnschrift SemiBold SemiConden",14),height=14,
+                                  text_color="white",bg_color="transparent")
+        self.latitude_value.place(x=7,y=120)
+
+        self.longitude_value = CTkLabel(self.ID_detail,text="Long\t=", font=("Bahnschrift SemiBold SemiConden",14),height=14,
+                                  text_color="white",bg_color="transparent")
+        self.longitude_value.place(x=7,y=140)
+
+        # self.alamat_value = CTkLabel(self.ID_detail,text="Long\t=", font=("Bahnschrift SemiBold SemiConden",14),height=14,
+        #                           text_color="white",bg_color="transparent")
+        # self.alamat_value.place(x=7,y=160)
+
+       
+    
+       
+
+
 
 
 
     def start_map(self):
         self.after(2000,self.map_handler)
+        self.startMap_Button.configure(fg_color="grey50",state='disabled')
+        self.stopMap_Button.configure(fg_color="#FF0000",state='normal')
+        
 
         # self.map_handler()
 
     def stop_map(self):
         self.map_widget.destroy()
-
+        self.startMap_Button.configure(fg_color="#228B22",state='normal')
+        self.stopMap_Button.configure(fg_color="grey50",state='disabled')
 
     def map_handler(self):
-        self.map_widget = tkmap.TkinterMapView(self.map_containter,width=1890,height=1360)
-        self.map_widget.place(x=15,y=15)
-        self.map_widget.set_position(-6.9203, 107.6232,marker=True)
+        
+        # Pandas Handler =================================================
+
+        try :
+            self.map_widget = tkmap.TkinterMapView(self.map_containter,width=1890,height=1360)
+            self.map_widget.place(x=15,y=15)
+
+            self.data = pd.read_csv(self.filename_csv)
+            self.data[['ID', 'Latitude', 'Longtitude']]
+
+            for index,row in self.data.iterrows():
+                id = row['ID']
+                latitude = row['Latitude']
+                longitude = row['Longtitude']
+
+                # print(f"{latitude},{longitude}")
+                self.map_widget.set_position(latitude, longitude,marker=True,text=f"{id}")
+
+           
+        except Exception as e :
+            self.stop_map()
+            CTkMessagebox(self,title="error",icon="cancel",message="CSV File cannot read",height=40,width=100)
+            self.startMap_Button.configure(fg_color="#228B22",state='normal')
+            self.stopMap_Button.configure(fg_color="grey50",state='disabled')
+            print(e)
+            
+    def location_detail(self):
+        # selected_row = self.data[self.data['ID'] == int(self.find_id.get()) ]
+        # Date	Time	Width	height	Elevation	temprature
+
+        try:
+            id = self.data.loc[self.data['ID'] == int(self.find_id.get()) , 'ID'].values[0]
+            latitude = self.data.loc[self.data['ID'] == int(self.find_id.get()) , 'Latitude'].values[0]
+            longitude = self.data.loc[self.data['ID'] == int(self.find_id.get()) , 'Longtitude'].values[0]
+            day = self.data.loc[self.data['ID'] == int(self.find_id.get()) , 'Day'].values[0]
+            date = self.data.loc[self.data['ID'] == int(self.find_id.get()) , 'Date'].values[0]
+            time = self.data.loc[self.data['ID'] == int(self.find_id.get()) , 'Time'].values[0]
+            width = self.data.loc[self.data['ID'] == int(self.find_id.get()) , 'Width'].values[0]
+            height = self.data.loc[self.data['ID'] == int(self.find_id.get()) , 'height'].values[0]
+            # elevation = selected_row['Elevation']
+            # temp = selected_row['temprature']
+
+            self.ID_value.configure(text=f"{id}")
+            self.latitude_value.configure(text=f"Lat\t= {latitude} °E")
+            self.longitude_value.configure(text=f"Long\t= {longitude} °N")
+            self.day_value.configure(text=f"Day\t= {day}, {date}")
+            self.time_value.configure(text=f"Time\t= {time}")
+            self.width_value.configure(text=f"Width\t= {width}")
+            self.lenght_value.configure(text=f"Lenght\t= {height}")
+
+            # adr = tkmap.convert_coordinates_to_address(latitude,longitude)
+            # listadr = adr.street,adr.housenumber,adr.postal,adr.city,adr.state,adr.country
+            # wrapper = textwrap.TextWrapper(width=30)
+            # word_list = wrapper.wrap(text=listadr)
+            
+
+            # self.alamat_value.configure(text=f"{word_list}")
+        
+        except Exception as e :
+            CTkMessagebox(self,title="error",icon="cancel",message="ID not found",height=40,width=100)
+            print(e)
+        
+
+
+
+
+
+            
+            
     
     def select_csv(self):
 
@@ -923,15 +1086,17 @@ class Page2(ctk.CTkFrame):
         filetypes = (('CSV files', '*.csv'), 
                      ('All files', '*.*'))
 
-        self.filename = filedialog.askopenfilename(
+        self.filename_csv = filedialog.askopenfilename(
             title='Open a file',
             initialdir=self.script_dir,
             filetypes=filetypes
             )
         
-        self.filename_var.set(os.path.basename(self.filename))
-        print(self.filename_var)
-
+        self.filename_var.set(os.path.basename(self.filename_csv))
+        self.path_name.configure(text=f"{self.filename_var.get()}")
+        
+        
+        
 
 class Page3(ctk.CTkFrame):
     def __init__(self, parent, controller):
@@ -977,11 +1142,6 @@ class Page3(ctk.CTkFrame):
         image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey20',width=100, height=100)
         image_camera.place(x=-12,y=370)
 
-
-
-        
-
-    
 
 if __name__ == "__main__":
     
