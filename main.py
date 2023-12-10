@@ -29,6 +29,8 @@ class tkinterApp(ctk.CTk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self._set_appearance_mode("dark")
+        
         container = ctk.CTkFrame(self)
         container.pack(side="top", fill="both", expand=True)
 
@@ -56,33 +58,35 @@ class StartPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
         super().__init__(parent)
         
-        
+        background = CTkLabel(self,width=1280,height=720,text='',bg_color="grey20")
+        background.place(x=0,y=0)
+
         self.updating_meter = False
         custom_font = font.Font(family="Bahnschrift SemiBold SemiConden",size=100, weight="bold")
 
-        side_bar = CTkCanvas(self, width=150,
-                                    height=1100, 
+        side_bar = CTkCanvas(background, width=150,
+                                    height=1490, 
                                     bg="gray10",
                                     highlightthickness=0,
                                     )
-        side_bar.pack(side=tk.LEFT, fill=tk.Y)
+        side_bar.place(x=0,y=0)
 
-        title = tk.Label(self,text = "POTHOLE",font = custom_font,fg="white",bg="gray20")
+        title = tk.Label(background,text = "POTHOLE",font = custom_font,fg="white",bg="gray20")
         title.place(x=200,y=50)
 
-        title1 = tk.Label(self,text = "AUTODETECTOR",font = custom_font,fg="white",bg="gray20")
+        title1 = tk.Label(background,text = "AUTODETECTOR",font = custom_font,fg="white",bg="gray20")
         title1.place(x=200,y=200)
 
         #Detection Button
 
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
         kamera_image = CTkImage(light_image=Image.open(os.path.join(self.script_dir, 'app_asset', 'kamera.png')),size=(80,80))
-        page1_button = CTkButton(self, width=500, 
+        page1_button = CTkButton(background, width=500, 
                           height=150, text='DETECT POTHOLE',
                           fg_color='grey', text_color='grey10',
                           command=lambda: controller.show_frame(Page1),
                           font=("Bahnschrift SemiBold SemiConden",45),
-                          hover_color="#fce101",image=kamera_image,
+                          hover_color="#fce101",image=kamera_image,bg_color='grey20'
                           
                           )
         page1_button.place(x=100,y=200)
@@ -90,12 +94,12 @@ class StartPage(ctk.CTkFrame):
         
         image_path1 = os.path.join(self.script_dir, 'app_asset', 'maps.png')
         image1 = CTkImage(light_image=Image.open(image_path1), size=(90,90))
-        page2 = CTkButton(self, width=500, 
+        page2 = CTkButton(background, width=500, 
                           height=150, text='  SHOW MAPS',
                           fg_color='grey', text_color='gray10',font=("Bahnschrift SemiBold SemiConden",45),
                           command=lambda: controller.show_frame(Page2),
                           hover_color="#fce101",
-                          image=image1
+                          image=image1,bg_color='grey20'
 
                           )
         page2.place(x=100,y=360)
@@ -107,27 +111,28 @@ class StartPage(ctk.CTkFrame):
         image_path2 = image_path1 = os.path.join(self.script_dir, 'app_asset', 'document.png')
         image2 = CTkImage(light_image=Image.open(image_path2), size=(90,90))
 
-        page3 = CTkButton(self, width=500, 
+        page3 = CTkButton(background, width=500, 
                           height=150, text=' SHOW DATA',
                           fg_color='grey', text_color='gray10',
                           command=lambda: controller.show_frame(Page3),
                           hover_color="#fce101",
                           image=image2,
-                          font=("Bahnschrift SemiBold SemiConden",45)
+                          font=("Bahnschrift SemiBold SemiConden",45),
+                          bg_color='grey20'
                           
                           )
         page3.place(x=100,y=520)
 
         image_home = os.path.join(self.script_dir, 'app_asset', 'home.png')
         imagehome = CTkImage(light_image=Image.open(image_home), size=(45,45))
-        image_home = CTkLabel(self,image=imagehome,text='',bg_color='grey20',width=100, height=100)
+        image_home = CTkLabel(background,image=imagehome,text='',bg_color='grey20',width=100, height=100)
         image_home.place(x=-12,y=45)
         
         # RIGHT SIDE BOX ======================================================================================
-        side_background = CTkLabel(self, width=640, height= 468, bg_color="grey",corner_radius=8, text='')
+        side_background = CTkButton(background, width=640, height= 468, bg_color="grey20",corner_radius=8, text='',state="disabled",fg_color="grey")
         side_background.place(x=620,y=200)
 
-        title_side = CTkLabel(self,text="SYSTEM INFORMATION", font=("Bahnschrift SemiBold SemiConden",18),text_color="grey10",bg_color="grey")
+        title_side = CTkLabel(background,text="SYSTEM INFORMATION", font=("Bahnschrift SemiBold SemiConden",18),text_color="grey10",bg_color="grey")
         title_side.place(x=865, y=220)
 
         # RAM Status ===========================================================================================
@@ -257,9 +262,9 @@ class StartPage(ctk.CTkFrame):
         self.altitude_value.place(x=450,y=85)
 
         self.update_ram_used()
-        self.update_gpu_name()
-        self.gpu_persentage()
-        self.gpu_used()
+        # self.update_gpu_name()
+        # self.gpu_persentage()
+        # self.gpu_used()
         
         
     
@@ -272,25 +277,25 @@ class StartPage(ctk.CTkFrame):
         
         self.ram_number.after(1010, self.update_ram_used)
             
-    def update_gpu_name(self):
-        gpu = GPUtil.getGPUs()
-        namagpu = gpu[0].name  
-        self.gpu_name.configure(text=f'{namagpu}')
+    # def update_gpu_name(self):
+    #     gpu = GPUtil.getGPUs()
+    #     namagpu = gpu[0].name  
+    #     self.gpu_name.configure(text=f'{namagpu}')
         
 
-    def gpu_persentage(self):
-        gpu = GPUtil.getGPUs()
-        used_persentage = gpu[0].load * 100
-        self.GpuLoadName.configure(text=f'{used_persentage} %')
-        self.GpuLoadName.after(1020,self.gpu_persentage)
+    # def gpu_persentage(self):
+    #     gpu = GPUtil.getGPUs()
+    #     used_persentage = gpu[0].load * 100
+    #     self.GpuLoadName.configure(text=f'{used_persentage} %')
+    #     self.GpuLoadName.after(1020,self.gpu_persentage)
         
-    def gpu_used(self):
-        gpu = GPUtil.getGPUs()
-        vram_used = gpu[0].memoryUsed
-        vram_total = gpu[0].memoryTotal
-        persentase_vram_used = (vram_used / vram_total) * 100
-        self.GPUVRAMNAME.configure(text=f'{round(persentase_vram_used, 2)} %')
-        self.GPUVRAMNAME.after(1040,self.gpu_used)
+    # def gpu_used(self):
+    #     gpu = GPUtil.getGPUs()
+    #     vram_used = gpu[0].memoryUsed
+    #     vram_total = gpu[0].memoryTotal
+    #     persentase_vram_used = (vram_used / vram_total) * 100
+    #     self.GPUVRAMNAME.configure(text=f'{round(persentase_vram_used, 2)} %')
+    #     self.GPUVRAMNAME.after(1040,self.gpu_used)
 
 
 
@@ -302,6 +307,9 @@ class Page1(ctk.CTkFrame):
 
         # self.__data1 = VideoData()
         
+        background = CTkLabel(self,width=1280,height=720,text='',bg_color="grey20")
+        background.place(x=0,y=0)
+
 
         self.is_running = False 
         self.elapsed_time = timedelta()
@@ -311,12 +319,12 @@ class Page1(ctk.CTkFrame):
 
 
 
-        side_bar = CTkCanvas(self, width=150,
-                                    height=1100, 
+        side_bar = CTkCanvas(background, width=150,
+                                    height=1490, 
                                     bg="gray10",
                                     highlightthickness=0
                                     )
-        side_bar.pack(side=tk.LEFT, fill=tk.Y)
+        side_bar.place(x=0,y=0)
 
         image_home = os.path.join(self.script_dir, 'app_asset', 'home.png')
         imagehome = CTkImage(light_image=Image.open(image_home), size=(45,45))
@@ -338,7 +346,7 @@ class Page1(ctk.CTkFrame):
 
         camera_logo_path = os.path.join(self.script_dir, 'app_asset', 'kamera2.png')
         imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(45,45))
-        image_camera = CTkLabel(self,image=imagehome,text='',bg_color='grey20',width=100, height=100)
+        image_camera = CTkLabel(background,image=imagehome,text='',bg_color='grey20',width=100, height=100)
         image_camera.place(x=-12,y=150)
 
         camera_logo_path = os.path.join(self.script_dir, 'app_asset', 'map.png')
@@ -354,7 +362,7 @@ class Page1(ctk.CTkFrame):
         #======================================== SIDE BOX SECTION ====================================================#
         
         
-        sidebox = CTkLabel(self,height=542, width=210,text="",bg_color="grey10")
+        sidebox = CTkLabel(background,height=542, width=210,text="",bg_color="grey10")
         sidebox.place(x=1060, y = 10)
         
         # JUDUL KOTAK SAMPING
@@ -364,10 +372,10 @@ class Page1(ctk.CTkFrame):
         countbox = CTkLabel(sidebox,bg_color="grey20",text='',width=200,height=100)
         countbox.place(x=5, y = 50)
 
-        numberbox = CTkLabel(countbox,bg_color="grey20",text='Pothole Counter',font=("Bahnschrift SemiBold SemiConden",14))
+        numberbox = CTkLabel(countbox,bg_color="grey20",text='Pothole Counter',font=("Bahnschrift SemiBold SemiConden",14),text_color="white")
         numberbox.place(x=55, y = 2)
 
-        self.counter_pothole = CTkLabel(countbox,bg_color="gray10",text='0',width=190,height=60,font=("Bahnschrift SemiBold SemiConden",24))
+        self.counter_pothole = CTkLabel(countbox,bg_color="gray10",text='0',width=190,height=60,font=("Bahnschrift SemiBold SemiConden",24),text_color="white")
         self.counter_pothole.place(x=5, y = 35)
 
         # Latitude longitude
@@ -375,19 +383,19 @@ class Page1(ctk.CTkFrame):
         latbox = CTkLabel(sidebox,bg_color="grey20",text='',width=200,height=150)
         latbox.place(x=5, y = 160)
 
-        location_box = CTkLabel(latbox,bg_color="transparent",text='Location',font=("Bahnschrift SemiBold SemiConden",14))
+        location_box = CTkLabel(latbox,bg_color="grey20",text='Location',font=("Bahnschrift SemiBold SemiConden",14),text_color="white")
         location_box.place(x=75, y = 2)
 
-        self.latitude = CTkLabel(latbox,bg_color="transparent",text='Latitude\t\t = - °E',font=("Bahnschrift SemiBold SemiConden",14))
+        self.latitude = CTkLabel(latbox,bg_color="grey20",text='Latitude\t\t = - °E',font=("Bahnschrift SemiBold SemiConden",14),text_color="white")
         self.latitude.place(x=5, y = 30)
 
-        self.longitude = CTkLabel(latbox,bg_color="transparent",text='Longitude\t\t = - °N',font=("Bahnschrift SemiBold SemiConden",14))
+        self.longitude = CTkLabel(latbox,bg_color="grey20",text='Longitude\t\t = - °N',font=("Bahnschrift SemiBold SemiConden",14),text_color="white")
         self.longitude.place(x=5, y = 50)
 
-        self.altimeter = CTkLabel(latbox,bg_color="transparent",text='Altitude\t\t = - m asl',font=("Bahnschrift SemiBold SemiConden",14))
+        self.altimeter = CTkLabel(latbox,bg_color="grey20",text='Altitude\t\t = - m asl',font=("Bahnschrift SemiBold SemiConden",14),text_color="white")
         self.altimeter.place(x=5, y = 70)
 
-        self.suhu = CTkLabel(latbox,bg_color="transparent",text='Temperature\t = - °C',font=("Bahnschrift SemiBold SemiConden",14))
+        self.suhu = CTkLabel(latbox,bg_color="grey20",text='Temperature\t = - °C',font=("Bahnschrift SemiBold SemiConden",14),text_color="white")
         self.suhu.place(x=5, y = 90)
 
         # DURATION BOX 
@@ -395,19 +403,19 @@ class Page1(ctk.CTkFrame):
         durationbox = CTkLabel(sidebox,bg_color="grey20",text='',width=200,height=95)
         durationbox.place(x=5, y = 320)
 
-        duration_title = CTkLabel(durationbox,bg_color="transparent",text='Detection Duration',font=("Bahnschrift SemiBold SemiConden",14))
+        duration_title = CTkLabel(durationbox,bg_color="grey20",text='Detection Duration',font=("Bahnschrift SemiBold SemiConden",14),text_color="white")
         duration_title.place(x=50, y = 2)
 
-        self.duration = CTkLabel(durationbox,bg_color="gray10",textvariable=self.time_var,width=190,height=50,font=("Bahnschrift SemiBold SemiConden",24))
+        self.duration = CTkLabel(durationbox,bg_color="gray10",textvariable=self.time_var,width=190,height=50,font=("Bahnschrift SemiBold SemiConden",24),text_color="white")
         self.duration.place(x=5, y = 35)
 
 
         # ======================================== BOTTOM BOX ================================================#
 
-        bottombox = CTkLabel(self,height=143, width=1185,text="",bg_color="grey10")
+        bottombox = CTkLabel(background,height=143, width=1185,text="",bg_color="grey10")
         bottombox.place(x=85, y = 565)
 
-        self.videobox = CTkCanvas(self, width=1920, height=1080)
+        self.videobox = CTkCanvas(background, width=1920, height=1080,bg="grey10")
         self.videobox.place(x=170,y=20) 
 
         #========================================= VIDEO SECTION =======================================================#
@@ -418,32 +426,34 @@ class Page1(ctk.CTkFrame):
         self.stopped = False
         
 
-        playbox = CTkLabel(bottombox, width=390, height=120,bg_color='transparent',text='')
+        playbox = CTkLabel(bottombox, width=390, height=120,bg_color='gray20',text='')
         playbox.place(x=12,y=12)
 
-        textbox = CTkLabel(playbox, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text="Video Control",bg_color='transparent',)
+        textbox = CTkLabel(playbox, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text="Video Control",bg_color='grey20',)
         textbox.place(x=160,y=1)
 
-        input = CTkLabel(bottombox, width=390, height=120,bg_color='transparent',text='')
+        input = CTkLabel(bottombox, width=390, height=120,bg_color='grey20',text='')
         input.place(x=410,y=12)
 
-        inputtextbox = CTkLabel(input, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text="Video Source",bg_color='transparent',)
+        inputtextbox = CTkLabel(input, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text="Video Source",bg_color='grey20',)
         inputtextbox.place(x=160,y=1)
 
-        self.file_name = CTkLabel(input, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text=f"path : ",bg_color='transparent',)
+        self.file_name = CTkLabel(input, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text=f"path : ",bg_color='grey20',)
         self.file_name.place(x=100,y=30)
 
         self.checkbox_var = BooleanVar()
-        self.checkbox1 = CTkCheckBox(input, text="File Source", variable=self.checkbox_var, command=self.on_checkbox_change,font=("Bahnschrift SemiBold SemiConden",14))
+        self.checkbox1 = CTkCheckBox(input, text="File Source",border_color="white", variable=self.checkbox_var, command=self.on_checkbox_change,font=("Bahnschrift SemiBold SemiConden",14),bg_color="grey20",text_color="white")
         self.checkbox1.place(x=265,y=35)
         
         
-        self.manual_input = CTkTextbox(input,height=12,width=200,font=("Bahnschrift SemiBold SemiConden",14))
+        self.manual_input = CTkTextbox(input,height=12,width=200,font=("Bahnschrift SemiBold SemiConden",14),bg_color="grey20",text_color="White",fg_color="grey")
         self.manual_input.place(x=10 ,y= 65)
         self.manual_input.configure(state="disabled")
 
         self.checkbox_var_manual = BooleanVar()
-        self.checkbox2 = CTkCheckBox(input, text="Manual Source", variable=self.checkbox_var_manual, command=self.on_checkbox_change,font=("Bahnschrift SemiBold SemiConden",14))
+        self.checkbox2 = CTkCheckBox(input, text="Manual Source", variable=self.checkbox_var_manual, 
+                                     command=self.on_checkbox_change,font=("Bahnschrift SemiBold SemiConden",14),
+                                     bg_color="grey20",text_color="white",border_color="white")
         self.checkbox2.place(x=265,y=70)
 
 
@@ -454,7 +464,8 @@ class Page1(ctk.CTkFrame):
                                  hover_color="#fce101",
                                  width=80,
                                  height=20,
-                                 font=("Bahnschrift SemiBold SemiConden",14)
+                                 font=("Bahnschrift SemiBold SemiConden",14),
+                                 bg_color="grey20"
                                 
                                  )
         self.file_input.place(x=10, y=35)
@@ -470,7 +481,8 @@ class Page1(ctk.CTkFrame):
                                  width=180,
                                  height=75,
                                  image=imagelogo,
-                                 font=("Bahnschrift SemiBold SemiConden",14)
+                                 font=("Bahnschrift SemiBold SemiConden",14),
+                                 bg_color="grey20"
                                  )
         start_button.place(x=10, y=35)
 
@@ -484,7 +496,7 @@ class Page1(ctk.CTkFrame):
                                  width=180,
                                  height=75,
                                  image=imagestop,
-                                 font=("Bahnschrift SemiBold SemiConden",14)
+                                 font=("Bahnschrift SemiBold SemiConden",14),bg_color="grey20"
                                  )
         stop_button.place(x=200, y=35)
 
@@ -492,10 +504,10 @@ class Page1(ctk.CTkFrame):
 
         # Untuk File handler csv
 
-        select_folder = CTkLabel(bottombox, width=360, height=120,bg_color='transparent',text='')
+        select_folder = CTkLabel(bottombox, width=360, height=120,bg_color='grey20',text='')
         select_folder.place(x=810,y=12)
 
-        select_foldertextbox = CTkLabel(select_folder, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text="Save Data",bg_color='transparent',)
+        select_foldertextbox = CTkLabel(select_folder, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text="Save Data",bg_color='grey20',)
         select_foldertextbox.place(x=155,y=1)
 
         self.folderinput = CTkButton(select_folder, 
@@ -505,24 +517,26 @@ class Page1(ctk.CTkFrame):
                                  hover_color="#fce101",
                                  width=80,
                                  height=20,
-                                 font=("Bahnschrift SemiBold SemiConden",14)
+                                 font=("Bahnschrift SemiBold SemiConden",14),
+                                 bg_color="grey20"
                                 
                                  )
         self.folderinput.place(x=10, y=35)
         self.file_input.configure(state="disabled")
 
-        self.folder_name = CTkLabel(select_folder, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text=f"path : ",bg_color='transparent',)
+        self.folder_name = CTkLabel(select_folder, text_color='white',font=("Bahnschrift SemiBold SemiConden",14),text=f"path : ",bg_color='grey20',)
         self.folder_name.place(x=100,y=30)
 
         self.checkbox_var_save = BooleanVar()
-        self.save = CTkCheckBox(select_folder, text="Save cropped", variable=self.checkbox_var_save,font=("Bahnschrift SemiBold SemiConden",14))
+        self.save = CTkCheckBox(select_folder, text="Save cropped", variable=self.checkbox_var_save,font=("Bahnschrift SemiBold SemiConden",14),
+                                bg_color="grey20",text_color="white",hover_color="#fce101",border_color="white")
         self.save.place(x=235,y=34)
 
         self.folder_file_name = CTkEntry(select_folder,height=24,width=250,font=("Bahnschrift SemiBold SemiConden",14),
-                                         placeholder_text="",text_color="white")
+                                         placeholder_text="",text_color="white",bg_color="grey",fg_color="grey20")
         self.folder_file_name.place(x=9 ,y= 87)
 
-        self.nameinputfolder = CTkLabel(select_folder, text_color='white',font=("Bahnschrift SemiBold SemiConden",13),text="Input name for folder and data file",bg_color='transparent',)
+        self.nameinputfolder = CTkLabel(select_folder, text_color='white',font=("Bahnschrift SemiBold SemiConden",13),text="Input name for folder and data file",bg_color='grey20',)
         self.nameinputfolder.place(x=10,y=58)
 
 
@@ -603,15 +617,22 @@ class Page1(ctk.CTkFrame):
         
         x = datetime.datetime.now()
 
-        folder_title = str(self.folder_file_name.get(1.0, "end-1c"))
-        main_path = f"{str(self.foldername)}"  
-        main_folder = os.path.join(main_path, folder_title)
+        # folder_title = str(f"{self.folder_file_name.get()}_potholeimage")
+        # main_path = f"{str(self.foldername)}"  
+        # main_folder = os.path.join(main_path, folder_title)
 
-        if not os.path.exists(main_folder):
-            os.makedirs(main_folder)
+        # if not os.path.exists(main_folder):
+        #     os.makedirs(main_folder)
+
+        parent_folder = str(self.foldername)
+        self.new_folder = os.path.join(parent_folder,f'{self.folder_file_name.get()}_folder')
+
+        if not os.path.exists(self.new_folder) :
+            os.makedirs(self.new_folder)
 
         file_name = f'{id}_{x.hour}_{x.minute}_{x.second}_{x.microsecond}.png'
-        cv2.imwrite(os.path.join(main_folder, file_name), img)
+        self.image_path = os.path.join(self.new_folder, file_name)
+        cv2.imwrite(self.image_path, img)
         
     def on_start(self):
         
@@ -635,7 +656,7 @@ class Page1(ctk.CTkFrame):
         if not input_content.get():
              error_message = "File and Folder name is Empty"
              CTkMessagebox(self,title="Error",message=error_message, height=200,width=400,icon="warning",
-                          font=("Bahnschrift SemiBold SemiConden",14))
+                          font=("Bahnschrift SemiBold SemiConden",14),bg_color="grey20")
              
              return
         
@@ -815,8 +836,15 @@ class Page1(ctk.CTkFrame):
         self.on_stop()
 
         if self.data:
+            
+            parent_folder = str(self.foldername)
+            self.new_folder = os.path.join(parent_folder,f'{self.folder_file_name.get()}_folder')
+
+            if not os.path.exists(self.new_folder) :
+                os.makedirs(self.new_folder)
+
             df = pd.DataFrame.from_dict(self.data, orient='index')
-            csv_filename = os.path.join(str(self.foldername), f'{self.folder_file_name.get()}'+'.csv')
+            csv_filename = os.path.join(self.new_folder, f'{self.folder_file_name.get()}'+'.csv')
             df.to_csv(csv_filename, index_label='ID')
             success_message = f'Data saved to {csv_filename}'
             CTkMessagebox(self, title="Success", message=success_message, height=200, width=400, icon="info",
@@ -825,18 +853,22 @@ class Page1(ctk.CTkFrame):
 
 
 
-class Page2(ctk.CTkFrame):
+class Page2(ctk.CTkFrame,CTk):
     def __init__(self, parent, controller):
         super().__init__(parent)
 
+        background = CTkLabel(self,width=1280,height=720,text='',bg_color="grey20")
+        background.place(x=0,y=0)
+
+
 
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
-        side_bar = CTkCanvas(self, width=150,
-                                    height=1100, 
+        side_bar = CTkCanvas(background, width=150,
+                                    height=1490, 
                                     bg="gray10",
                                     highlightthickness=0,
                                     )
-        side_bar.pack(side=tk.LEFT, fill=tk.Y)
+        side_bar.place(x=0,y=0)
 
         image_home = os.path.join(self.script_dir, 'app_asset', 'home.png')
         imagehome = CTkImage(light_image=Image.open(image_home), size=(45,45))
@@ -874,7 +906,7 @@ class Page2(ctk.CTkFrame):
 
 
         # JUDUL KOTAK SAMPING 
-        sidebox = CTkLabel(self,height=695, width=210,text="",bg_color="grey10")
+        sidebox = CTkLabel(background,height=695, width=210,text="",bg_color="grey10")
         sidebox.place(x=1060, y = 10)
 
         title_sidebox = CTkLabel(sidebox,bg_color="grey10",text='Map Configuration',font=("Bahnschrift SemiBold SemiConden",16),text_color='white')
@@ -884,68 +916,75 @@ class Page2(ctk.CTkFrame):
         box_file_hander_map_csv = CTkLabel(sidebox,bg_color="grey20",text='',width=200,height=170)
         box_file_hander_map_csv.place(x=5, y = 45)
 
-        title_handler_map_csv = CTkLabel(box_file_hander_map_csv,bg_color="transparent",text='CSV Handler',font=("Bahnschrift SemiBold SemiConden",14))
+        title_handler_map_csv = CTkLabel(box_file_hander_map_csv,bg_color="grey20",text='CSV Handler',font=("Bahnschrift SemiBold SemiConden",14),text_color="white")
         title_handler_map_csv.place(x=65, y = 5)
 
 
         
-        self.map_containter = CTkLabel(self,width=960,height=695,text="Click Start to show map",bg_color="grey10",text_color="white")
+        self.map_containter = CTkLabel(background,width=960,height=695,text="Click Start to show map",bg_color="grey10",text_color="white")
         self.map_containter.place(x=90,y=12)
     
         #  MAP SEGMENTATION ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-        title_handler_map_csv = CTkLabel(sidebox,bg_color="grey10",text='Start/Stop Showing Map',font=("Bahnschrift SemiBold SemiConden",14))
+        title_handler_map_csv = CTkLabel(sidebox,bg_color="grey10",text='Start/Stop Showing Map',font=("Bahnschrift SemiBold SemiConden",14),text_color="white")
         title_handler_map_csv.place(x=40, y = 230)
 
 
         # START / STOP SHOWING MAP 
         self.startMap_Button = CTkButton(sidebox,height=100,width=90, text="START",command=self.start_map,fg_color="#228B22",
-                                    hover_color="#fce101",font=("Bahnschrift SemiBold SemiConden",18))
+                                    hover_color="#fce101",font=("Bahnschrift SemiBold SemiConden",18),bg_color="grey20")
         self.startMap_Button.place(x=10,y=270)
 
 
         self.stopMap_Button = CTkButton(sidebox,height=100,width=90, text="STOP",command=self.stop_map,fg_color="grey50",
-                                        hover_color="#fce101",font=("Bahnschrift SemiBold SemiConden",18))
+                                        hover_color="#fce101",font=("Bahnschrift SemiBold SemiConden",18),bg_color="grey20")
         self.stopMap_Button.place(x=110,y=270)
         self.stopMap_Button.configure(state='disabled')
 
 
-        choose_csv = CTkButton(box_file_hander_map_csv,height=40,width=190, 
+        self.choose_csv = CTkButton(box_file_hander_map_csv,height=40,width=190, 
                                text="Select CSV",
                                fg_color="grey50",
                                hover_color="#fce101",
                                font=("Bahnschrift SemiBold SemiConden",16),
                                 text_color="grey10",
-                               command=self.select_csv)
-        choose_csv.place(x=5,y=40)
+                               command=self.select_csv,
+                               bg_color="grey20"
+                               )
+        
+        self.choose_csv.place(x=5,y=40)
 
-        title_csv_path = CTkLabel(sidebox,bg_color="transparent",text='CSV Path',font=("Bahnschrift SemiBold SemiConden",12),text_color='white')
+        title_csv_path = CTkLabel(sidebox,bg_color="grey20",text='CSV Path',font=("Bahnschrift SemiBold SemiConden",12),text_color='white')
         title_csv_path.place(x=12, y = 125)
 
         self.csv_path = CTkButton(box_file_hander_map_csv,width=190,height=40,text='',fg_color="grey50",
-                                  font=("Bahnschrift SemiBold SemiConden",16),
+                                  font=("Bahnschrift SemiBold SemiConden",16),bg_color="grey20",
                                  state="disabled")
         self.csv_path.place(x=5,y=110)
 
         self.path_name = CTkLabel(self.csv_path,text="", font=("Bahnschrift SemiBold SemiConden",12),
-                                  text_color="grey10")
+                                  text_color="grey10",bg_color="transparent")
         self.path_name.place(x=10,y=5)
 
         # FIND DETAIL MAP DATA =======================================================================
 
-        title_detail_map = CTkLabel(sidebox,bg_color="grey10",text='Find Detail Point ID',font=("Bahnschrift SemiBold SemiConden",14))
+        title_detail_map = CTkLabel(sidebox,bg_color="grey10",text='Find Detail Point ID',font=("Bahnschrift SemiBold SemiConden",14),text_color="white")
         title_detail_map.place(x=50, y = 390)
 
-        self.find_id = CTkEntry(sidebox,height=30,width=150,placeholder_text="input ID to find detail")
+        self.find_id = CTkEntry(sidebox,height=30,width=150,placeholder_text="input ID to find detail",bg_color="grey20",text_color="white",fg_color="grey30")
         self.find_id.place(x=10 ,y=420)
+        self.find_id.configure(state='disabled')
 
         search_logo_path = os.path.join(self.script_dir, 'app_asset', 'cari.png')
         search_logo = CTkImage(light_image=Image.open(search_logo_path), size=(20,20))
-        find_button = CTkButton(sidebox,height=30,width=30,fg_color="grey50",font=("Bahnschrift SemiBold SemiConden",12),
-                                image=search_logo,text='',command=self.location_detail)
-        find_button.place(x=165, y=420)
+        self.find_button = CTkButton(sidebox,height=30,width=30,fg_color="grey50",font=("Bahnschrift SemiBold SemiConden",12),
+                                image=search_logo,text='',command=self.location_detail,bg_color="grey20")
+        self.find_button.place(x=165, y=420)
+        self.find_button.configure(state='disabled')
 
-        self.ID_detail = CTkButton(sidebox,width=190,height=220,text='',fg_color="grey50",
+
+
+        self.ID_detail = CTkButton(sidebox,width=190,height=170,text='',fg_color="grey50",bg_color="grey20",
                                   font=("Bahnschrift SemiBold SemiConden",16),
                                  state="disabled")
         self.ID_detail.place(x=10,y=460)
@@ -987,26 +1026,54 @@ class Page2(ctk.CTkFrame):
         #                           text_color="white",bg_color="transparent")
         # self.alamat_value.place(x=7,y=160)
 
-       
+        self.button_show = CTkButton(sidebox,height=40,width=140,command=self.photo_detail,
+                                     text="Show Pothole Image",fg_color="grey50",text_color="white",
+                                     font=("Bahnschrift SemiBold SemiConden",14),bg_color="grey20"
+                                     )
+        self.button_show.place(x=10,y=640)
+        self.button_show.configure(state="disabled")
+
+        self.indicator_button_show = CTkButton(sidebox,height=40,width=40,text='',state='disabled',bg_color="grey")
+        self.indicator_button_show.place(x=160,y=640)
+        self.indicator_button_show.configure(fg_color="#FF0000")
+
+        self.empty_field()
     
        
-
-
-
 
 
     def start_map(self):
         self.after(2000,self.map_handler)
         self.startMap_Button.configure(fg_color="grey50",state='disabled')
         self.stopMap_Button.configure(fg_color="#FF0000",state='normal')
-        
+        self.choose_csv.configure(state='disabled')
 
         # self.map_handler()
+
+
+    def empty_field (self) :
+        '''
+        This code for clear the parameter if stop button was pressed
+        '''
+        self.ID_value.configure(text=f"-")
+        self.latitude_value.configure(text=f"Lat\t= - °E")
+        self.longitude_value.configure(text=f"Long\t= - °N")
+        self.day_value.configure(text=f"Day\t= - , -")
+        self.time_value.configure(text=f"Time\t= - ")
+        self.width_value.configure(text=f"Width\t= - cm")
+        self.lenght_value.configure(text=f"Lenght\t= - cm")
 
     def stop_map(self):
         self.map_widget.destroy()
         self.startMap_Button.configure(fg_color="#228B22",state='normal')
         self.stopMap_Button.configure(fg_color="grey50",state='disabled')
+        self.button_show.configure(state="disabled")
+        self.find_button.configure(state='disabled')
+        self.find_id.configure(state="disabled")
+        self.indicator_button_show.configure(fg_color="#FF0000")
+        self.choose_csv.configure(state='normal')
+
+        self.empty_field()
 
     def map_handler(self):
         
@@ -1027,13 +1094,19 @@ class Page2(ctk.CTkFrame):
                 # print(f"{latitude},{longitude}")
                 self.map_widget.set_position(latitude, longitude,marker=True,text=f"{id}")
 
+            self.find_id.configure(state="normal")
+            self.find_button.configure(state="normal")
+            # self.indicator_button_show.configure(fg_color="#228B22")
+            
+
            
-        except Exception as e :
+        except Exception :
             self.stop_map()
             CTkMessagebox(self,title="error",icon="cancel",message="CSV File cannot read",height=40,width=100)
             self.startMap_Button.configure(fg_color="#228B22",state='normal')
             self.stopMap_Button.configure(fg_color="grey50",state='disabled')
-            print(e)
+            # self.indicator_button_show.configure(fg_color="#FF0000")
+            # print(e)
             
     def location_detail(self):
         # selected_row = self.data[self.data['ID'] == int(self.find_id.get()) ]
@@ -1056,8 +1129,8 @@ class Page2(ctk.CTkFrame):
             self.longitude_value.configure(text=f"Long\t= {longitude} °N")
             self.day_value.configure(text=f"Day\t= {day}, {date}")
             self.time_value.configure(text=f"Time\t= {time}")
-            self.width_value.configure(text=f"Width\t= {width}")
-            self.lenght_value.configure(text=f"Lenght\t= {height}")
+            self.width_value.configure(text=f"Width\t= {width} cm")
+            self.lenght_value.configure(text=f"Lenght\t= {height} cm")
 
             # adr = tkmap.convert_coordinates_to_address(latitude,longitude)
             # listadr = adr.street,adr.housenumber,adr.postal,adr.city,adr.state,adr.country
@@ -1065,19 +1138,76 @@ class Page2(ctk.CTkFrame):
             # word_list = wrapper.wrap(text=listadr)
             
 
+            folder_path = str(self.folder_name_csv)  # Replace this with the actual path to your folder
+            files_in_folder = os.listdir(folder_path)
+
+            matching_files = [file for file in files_in_folder if self.extract_prefix(file) == str(self.find_id.get()) and file.endswith(".png")]
+            
+            '''
+            Code below for find if there any csv file that matching with id wanna to
+            search then on the button and confirm gave signal indicator to greeen, that 
+            indicate file .png that id find available and ready to show.
+
+            '''
+
+
+            if not matching_files:
+                self.button_show.configure(state="disabled")
+                self.indicator_button_show.configure(fg_color="#FF0000")
+                # self.empty_field()
+                return
+            
+            else :
+                self.button_show.configure(state="normal")
+                self.indicator_button_show.configure(fg_color="#228B22")
+
+
             # self.alamat_value.configure(text=f"{word_list}")
-        
+
         except Exception as e :
             CTkMessagebox(self,title="error",icon="cancel",message="ID not found",height=40,width=100)
-            print(e)
-        
+            self.button_show.configure(state="disabled")
+            self.indicator_button_show.configure(fg_color="#FF0000")
+            self.empty_field()
+
+    def extract_prefix(self, filename):
+        # Extract the part of the file name before the first underscore
+            parts = filename.split('_')
+            if parts:
+                return parts[0]
+            return ''
+    
+    def photo_detail(self):
+        folder_path = str(self.folder_name_csv)  # Replace this with the actual path to your folder
+        # files_in_folder = os.listdir(folder_path)
+        # if not any(file.endswith('.png') for file in files_in_folder):
+        #     print(f"Error: No .png files found in {folder_path}")
+        #     return
+        # else :
+        prefix_to_match = int(self.find_id.get())
+
+        photo_detail_window = PhotoDetailWindow(self, folder_path, prefix_to_match)
+        photo_detail_window.focus()
+
+        # List all files in the folder
+        # files_in_folder = os.listdir(folder_path)
+
+        # # Filter files that match the condition (start with "18" and have the ".png" extension)
+        # matching_files = [file for file in files_in_folder if file.startswith(prefix_to_match) and file.endswith(".png")]
+
+        # # Print the matching files
+        # for file in matching_files:
+        #     file_path = os.path.join(folder_path,file)
+        #     image = Image.open(file_path)
+        #     photo = CTkImage(light_image=image, size=(45,45))
+
+        #     top = CTkToplevel(self)
+        #     top.title(prefix_to_match)
+
+        #     photo_label = CTkLabel(top,image=photo)
+        #     photo_label.pack()
 
 
-
-
-
-            
-            
     
     def select_csv(self):
 
@@ -1094,20 +1224,66 @@ class Page2(ctk.CTkFrame):
         
         self.filename_var.set(os.path.basename(self.filename_csv))
         self.path_name.configure(text=f"{self.filename_var.get()}")
-        
-        
+
+        self.folder_name_csv = os.path.dirname(self.filename_csv)
         
 
+class PhotoDetailWindow(ctk.CTkToplevel):
+    def __init__(self, master, folder_path, prefix_to_match):
+        super().__init__(master)
+        self.title(f"ID_{prefix_to_match}")
+        
+        self.resizable(False,False)
+
+        files_in_folder = os.listdir(folder_path)
+
+        # Filter files that match the condition (start with the specified prefix and have the ".png" extension)
+        matching_files = [file for file in files_in_folder if self.extract_prefix(file) == str(prefix_to_match) and file.endswith(".png")]
+        
+        if not matching_files:
+            return
+
+        # Display matching images
+        for file in matching_files:
+            file_path = os.path.join(folder_path, file)
+            image = Image.open(file_path)
+
+            width,height = image.size
+            photo = ctk.CTkImage(light_image=image, size=(width*2, height*2))
+
+            photo_label = ctk.CTkLabel(self,text='', image=photo,height=100,width=100)
+            photo_label.pack(pady=50)
+
+        geo = f"{width*4}x{height*4}"
+
+        self.geometry(geo)
+
+    def extract_prefix(self, filename):
+        # Extract the part of the file name before the first underscore
+        parts = filename.split('_')
+        if parts:
+            return parts[0]
+        return ''
+    
 class Page3(ctk.CTkFrame):
     def __init__(self, parent, controller):
         super().__init__(parent)
+
+        '''
+        Below this variable that use as GUI of front of document page
+        '''
+
+        background = CTkLabel(self,width=1280,height=720,text='',bg_color="grey20")
+        background.place(x=0,y=0)
+
         self.script_dir = os.path.dirname(os.path.abspath(__file__))
-        side_bar = CTkCanvas(self, width=150,
-                                    height=1100, 
+        side_bar = CTkCanvas(background, width=150,
+                                    height=1490, 
                                     bg="gray10",
                                     highlightthickness=0,
                                     )
-        side_bar.pack(side=tk.LEFT, fill=tk.Y)
+        side_bar.place(x=0,y=0)
+        
 
         image_home = os.path.join(self.script_dir, 'app_asset', 'home.png')
         imagehome = CTkImage(light_image=Image.open(image_home), size=(45,45))
@@ -1142,6 +1318,39 @@ class Page3(ctk.CTkFrame):
         image_camera = CTkLabel(side_bar,image=imagehome,text='',bg_color='grey20',width=100, height=100)
         image_camera.place(x=-12,y=370)
 
+        '''
+        Below this GUI For data visualization
+        '''
+
+        total_pothole_box = CTkButton(background,width=240,height=160,text='',fg_color="grey50",
+                                  font=("Bahnschrift SemiBold SemiConden",16),corner_radius=6,bg_color="grey20",border_color="white",border_width=3,
+                                 state="disabled")
+        total_pothole_box.place(x=90,y=15)
+
+        total_width_mean_box = CTkButton(background,width=240,height=160,text='',fg_color="grey50",
+                                  font=("Bahnschrift SemiBold SemiConden",16),corner_radius=6,bg_color="grey20",
+                                 state="disabled")
+        total_width_mean_box.place(x=350,y=15)
+
+        total_lenght_mean_box = CTkButton(background,width=240,height=160,text='',fg_color="grey50",
+                                  font=("Bahnschrift SemiBold SemiConden",16),corner_radius=6,bg_color="grey20",
+                                 state="disabled")
+        total_lenght_mean_box.place(x=610,y=15)
+
+        self.plot_box = CTkTabview(background,height=480,width=760,bg_color="grey20",fg_color="grey10",border_color="white",border_width=2,corner_radius=6)
+        self.plot_box.place(x=90,y=190)
+
+        self.plot_box.add("Barplot")
+        self.plot_box.add("Heatmap")
+
+        
+
+        
+    
+
+    
+
+
 
 if __name__ == "__main__":
     
@@ -1150,6 +1359,7 @@ if __name__ == "__main__":
     app.title('Pothole Detector')
     app.geometry("1280x720")
     app.resizable(False,False)
+    
     app.iconbitmap(os.path.join(script_dir, 'app_asset', 'hat.ico'))
     
     app.mainloop()
