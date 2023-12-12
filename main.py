@@ -1,5 +1,6 @@
 # import tkinter as tk
 # from tkinter import ttk
+from CTkTable import *
 import socket
 import customtkinter as ctk
 from customtkinter import*
@@ -24,35 +25,56 @@ import psutil
 import GPUtil
 import tkintermapview as tkmap
 import textwrap
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
+import matplotlib.pyplot as plt
+
 
 class tkinterApp(ctk.CTk):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self._set_appearance_mode("dark")
+        if self.network_checker():
+
+            container = ctk.CTkFrame(self)
+            container.pack(side="top", fill="both", expand=True)
+
+            container.grid_rowconfigure(0, weight=1)
+            container.grid_columnconfigure(0, weight=1)
+
+            self.frames = {}
+
+            for F in (StartPage, Page1, Page2, Page3):
+                frame = F(container, self)
+                self.frames[F] = frame
+                frame.grid(row=0, column=0, sticky="nsew")
+                
+
+            self.show_frame(StartPage)
         
-        container = ctk.CTkFrame(self)
-        container.pack(side="top", fill="both", expand=True)
-
-        container.grid_rowconfigure(0, weight=1)
-        container.grid_columnconfigure(0, weight=1)
-
-        self.frames = {}
-
-        for F in (StartPage, Page1, Page2, Page3):
-            frame = F(container, self)
-            self.frames[F] = frame
-            frame.grid(row=0, column=0, sticky="nsew")
+        else : 
+            msg = CTkMessagebox(message="Connect your internet", icon="warning"
+                                ,height=40,width=100,option_1="Exit")
             
+            if msg.get() == "Exit":
+                return sys.exit()
+    
+        self.protocol("WM_DELETE_WINDOW",self.on_closing)
 
-        self.show_frame(StartPage)
-        
+    def on_closing(self):
+        return sys.exit(0)
+            
 
     def show_frame(self, cont):
         frame = self.frames[cont]
         frame.tkraise()
             
-        
+    def network_checker(self):
+        try:
+            socket.create_connection(("www.google.com", 80))
+            return True
+        except OSError:
+            return False
+            
         
 class StartPage(ctk.CTkFrame):
     def __init__(self, parent, controller):
@@ -262,6 +284,7 @@ class StartPage(ctk.CTkFrame):
         self.altitude_value.place(x=450,y=85)
 
         self.update_ram_used()
+        self.outdoor_status()
         # self.update_gpu_name()
         # self.gpu_persentage()
         # self.gpu_used()
@@ -276,6 +299,16 @@ class StartPage(ctk.CTkFrame):
         self.ram_number.configure(text=f'{percent_used} %')
         
         self.ram_number.after(1010, self.update_ram_used)
+
+    def outdoor_status(self):
+        lat, long = curr_loc.coordinates()
+        temprature,elevation = curr_loc.temprature_data(lat,long)
+        #  
+        self.weather_value.configure(text=f"{round(temprature,2)} °C")
+        self.latitude_value.configure(text=f"{round(lat,2)} °E  ")
+        self.longitude_value.configure(text=f'{round(long,2)} °N')
+        self.altitude_value.configure(text=f'{round(elevation,2)} m')
+        
             
     # def update_gpu_name(self):
     #     gpu = GPUtil.getGPUs()
@@ -772,6 +805,7 @@ class Page1(ctk.CTkFrame):
                             'Elevation' : elevation,
                             "temprature" : temprature
                         }
+                       
 
             
             self.latitude.configure(text=f'Latitude\t\t = {lat} °E')
@@ -909,15 +943,15 @@ class Page2(ctk.CTkFrame,CTk):
         sidebox = CTkLabel(background,height=695, width=210,text="",bg_color="grey10")
         sidebox.place(x=1060, y = 10)
 
-        title_sidebox = CTkLabel(sidebox,bg_color="grey10",text='Map Configuration',font=("Bahnschrift SemiBold SemiConden",16),text_color='white')
-        title_sidebox.place(x=50, y = 5)
+        title_sidebox = CTkLabel(sidebox,bg_color="grey10",text='MAP CONFIGURATIONS',font=("Bahnschrift SemiBold SemiConden",16),text_color='white')
+        title_sidebox.place(x=37, y = 5)
 
         
         box_file_hander_map_csv = CTkLabel(sidebox,bg_color="grey20",text='',width=200,height=170)
         box_file_hander_map_csv.place(x=5, y = 45)
 
-        title_handler_map_csv = CTkLabel(box_file_hander_map_csv,bg_color="grey20",text='CSV Handler',font=("Bahnschrift SemiBold SemiConden",14),text_color="white")
-        title_handler_map_csv.place(x=65, y = 5)
+        title_handler_map_csv = CTkLabel(box_file_hander_map_csv,bg_color="grey20",text='CSV HANDLER',font=("Bahnschrift SemiBold SemiConden",14),text_color="white")
+        title_handler_map_csv.place(x=62, y = 5)
 
 
         
@@ -926,8 +960,8 @@ class Page2(ctk.CTkFrame,CTk):
     
         #  MAP SEGMENTATION ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-        title_handler_map_csv = CTkLabel(sidebox,bg_color="grey10",text='Start/Stop Showing Map',font=("Bahnschrift SemiBold SemiConden",14),text_color="white")
-        title_handler_map_csv.place(x=40, y = 230)
+        title_handler_map_csv = CTkLabel(sidebox,bg_color="grey10",text='START/STOP SHOWING MAP',font=("Bahnschrift SemiBold SemiConden",14),text_color="white")
+        title_handler_map_csv.place(x=32, y = 230)
 
 
         # START / STOP SHOWING MAP 
@@ -968,8 +1002,8 @@ class Page2(ctk.CTkFrame,CTk):
 
         # FIND DETAIL MAP DATA =======================================================================
 
-        title_detail_map = CTkLabel(sidebox,bg_color="grey10",text='Find Detail Point ID',font=("Bahnschrift SemiBold SemiConden",14),text_color="white")
-        title_detail_map.place(x=50, y = 390)
+        title_detail_map = CTkLabel(sidebox,bg_color="grey10",text='FIND ID DETAIL',font=("Bahnschrift SemiBold SemiConden",14),text_color="white")
+        title_detail_map.place(x=60, y = 390)
 
         self.find_id = CTkEntry(sidebox,height=30,width=150,placeholder_text="input ID to find detail",bg_color="grey20",text_color="white",fg_color="grey30")
         self.find_id.place(x=10 ,y=420)
@@ -1033,7 +1067,7 @@ class Page2(ctk.CTkFrame,CTk):
         self.button_show.place(x=10,y=640)
         self.button_show.configure(state="disabled")
 
-        self.indicator_button_show = CTkButton(sidebox,height=40,width=40,text='',state='disabled',bg_color="grey")
+        self.indicator_button_show = CTkButton(sidebox,height=40,width=40,text='',state='disabled',bg_color="grey10")
         self.indicator_button_show.place(x=160,y=640)
         self.indicator_button_show.configure(fg_color="#FF0000")
 
@@ -1266,12 +1300,15 @@ class PhotoDetailWindow(ctk.CTkToplevel):
         return ''
     
 class Page3(ctk.CTkFrame):
-    def __init__(self, parent, controller):
+    def __init__(self, parent,controller):
         super().__init__(parent)
 
         '''
         Below this variable that use as GUI of front of document page
         '''
+
+        self.is_start = False
+        self.controller = controller
 
         background = CTkLabel(self,width=1280,height=720,text='',bg_color="grey20")
         background.place(x=0,y=0)
@@ -1287,13 +1324,12 @@ class Page3(ctk.CTkFrame):
 
         image_home = os.path.join(self.script_dir, 'app_asset', 'home.png')
         imagehome = CTkImage(light_image=Image.open(image_home), size=(45,45))
-        # image_home = CTkLabel(self,image=imagehome,text='',bg_color='grey10',height=100)
-        # image_home.place(x=12,y=50)
+
 
         page3 = CTkButton(side_bar, 
                           text='',
                           fg_color='grey10',
-                          command=lambda: controller.show_frame(StartPage),
+                          command=self.back_to_homepage,
                           hover_color="#fce101",
                           image=imagehome,
                           height=100,
@@ -1302,6 +1338,7 @@ class Page3(ctk.CTkFrame):
                           
                           )
         page3.place(x=0,y=45)
+
 
         camera_logo_path = os.path.join(self.script_dir, 'app_asset', 'kamera2.png')
         imagehome = CTkImage(light_image=Image.open(camera_logo_path), size=(45,45))
@@ -1319,40 +1356,249 @@ class Page3(ctk.CTkFrame):
         image_camera.place(x=-12,y=370)
 
         '''
-        Below this GUI For data visualization
+        Below this GUI For data visualization using pandas dataframe for data
+        processing and using matpoltib.pyplot for ploting 
         '''
 
-        total_pothole_box = CTkButton(background,width=240,height=160,text='',fg_color="grey50",
-                                  font=("Bahnschrift SemiBold SemiConden",16),corner_radius=6,bg_color="grey20",border_color="white",border_width=3,
+        total_pothole_box = CTkButton(background,width=240,height=160,text='',fg_color="grey10",
+                                  font=("Bahnschrift SemiBold SemiConden",16),corner_radius=6,bg_color="grey20",border_color="white",border_width=1,
                                  state="disabled")
         total_pothole_box.place(x=90,y=15)
 
-        total_width_mean_box = CTkButton(background,width=240,height=160,text='',fg_color="grey50",
-                                  font=("Bahnschrift SemiBold SemiConden",16),corner_radius=6,bg_color="grey20",
+        total_width_mean_box = CTkButton(background,width=240,height=160,text='',fg_color="grey10",
+                                  font=("Bahnschrift SemiBold SemiConden",16),corner_radius=6,bg_color="grey20",border_color="white",border_width=1,
                                  state="disabled")
         total_width_mean_box.place(x=350,y=15)
 
-        total_lenght_mean_box = CTkButton(background,width=240,height=160,text='',fg_color="grey50",
-                                  font=("Bahnschrift SemiBold SemiConden",16),corner_radius=6,bg_color="grey20",
+        total_lenght_mean_box = CTkButton(background,width=240,height=160,text='',fg_color="grey10",
+                                  font=("Bahnschrift SemiBold SemiConden",16),corner_radius=6,bg_color="grey20",border_color="white",border_width=1,
                                  state="disabled")
         total_lenght_mean_box.place(x=610,y=15)
 
-        self.plot_box = CTkTabview(background,height=480,width=760,bg_color="grey20",fg_color="grey10",border_color="white",border_width=2,corner_radius=6)
+        file_handler_box = CTkButton(background,width=390,height=160,text='',fg_color="grey10",
+                                  font=("Bahnschrift SemiBold SemiConden",16),corner_radius=6,bg_color="grey20",border_color="white",border_width=1,
+                                 state="disabled")
+        file_handler_box.place(x=870,y=15)
+
+        self.plot_box = CTkTabview(background,height=500,width=760,bg_color="grey20",fg_color="grey10",border_color="white",border_width=1,corner_radius=6)
         self.plot_box.place(x=90,y=190)
 
-        self.plot_box.add("Barplot")
-        self.plot_box.add("Heatmap")
+        self.plot_box.add("BARPLOT")
+        self.plot_box.add("HEATMAP")
+        self.plot_box.add("TABLE")
 
+        '''
+        Below this variable that used to insert the value to the box 
+        '''
+
+        self.total_pothole_value = CTkLabel(total_pothole_box,text="0",font=("Bahnschrift SemiBold SemiConden",72),text_color="white",bg_color="gray10")
+        self.total_pothole_value.place(x=15,y=1)
+
+        self.total_width_mean_value = CTkLabel(total_width_mean_box,text="0.0",font=("Bahnschrift SemiBold SemiConden",72),text_color="white",bg_color="gray10")
+        self.total_width_mean_value.place(x=15,y=1)
+
+        self.total_lenght_mean_value = CTkLabel(total_lenght_mean_box,text="0.0",font=("Bahnschrift SemiBold SemiConden",72),text_color="white",bg_color="gray10")
+        self.total_lenght_mean_value.place(x=15,y=1)
+
+
+        '''
+        Below this, this is variable that used to give the name of the box
+        '''
+        title_pothole_box = CTkLabel(total_pothole_box,text="POTHOLE DETECTED",font=("Bahnschrift SemiBold SemiConden",28),text_color="white",bg_color="gray10")
+        title_pothole_box.place(x=12,y=110)
+
+        line = CTkLabel(total_pothole_box,height=1,width=100,bg_color="grey20",fg_color="white",text='')
+        line.place(x=12,y = 90)
+
+        # FOR pothole Width Avarage
+        title_width_avarage = CTkLabel(total_width_mean_box,text="WIDTH AVERAGE",font=("Bahnschrift SemiBold SemiConden",28),text_color="white",bg_color="gray10")
+        title_width_avarage.place(x=12,y=110)
+
+        line = CTkLabel(total_width_mean_box,height=1,width=100,bg_color="grey20",fg_color="white",text='')
+        line.place(x=12,y = 90)
+
+        # For Lenght Avarage
+        title_lenght_avarage = CTkLabel(total_lenght_mean_box,text="LENGHT AVERAGE",font=("Bahnschrift SemiBold SemiConden",28),text_color="white",bg_color="gray10")
+        title_lenght_avarage.place(x=12,y=110)
+
+        line = CTkLabel(total_lenght_mean_box,height=1,width=100,bg_color="grey20",fg_color="white",text='')
+        line.place(x=12,y = 90)
+
+        # For File input
+
+        title_file_input = CTkLabel(file_handler_box,text="FILE HANDLER",font=("Bahnschrift SemiBold SemiConden",25),text_color="white",bg_color="gray10")
+        title_file_input.place(x=12,y=125)
+
+        line = CTkLabel(file_handler_box,height=10,width=180,text_color="white",bg_color="grey20",fg_color="white",text='')
+        line.place(x=12,y = 105)
+
+        line_vertical = CTkLabel(file_handler_box,height=140,width=15,text_color="white",bg_color="grey20",fg_color="white",text='')
+        line_vertical.place(x=190,y = 10)
+
+        title_file_input = CTkLabel(file_handler_box,text="CSV PATH",font=("Bahnschrift SemiBold SemiConden",14),text_color="white",bg_color="gray10")
+        title_file_input.place(x=12,y=5)
+        
+        self.select_button_csv = CTkButton(file_handler_box,text="SELECT CSV",font=("Bahnschrift SemiBold SemiConden",14),text_color="white",
+                                        bg_color="gray10",height=30,width=170,fg_color="grey50",hover_color="#fce101",command=self.select_csv)
+        self.select_button_csv.place(x=12,y=32)
+
+        self.csv_path = CTkButton(file_handler_box,text="",font=("Bahnschrift SemiBold SemiConden",14),text_color="white",
+                                        bg_color="gray10",height=30,width=170,fg_color="grey50",hover_color="#fce101",state="diabled",border_color="white",
+                                        border_width=1)
+        self.csv_path.place(x=12,y=68)
+
+        # START / STOP ANALYZE BUTTON
+
+        self.start_analyze = CTkButton(file_handler_box,text="START ANALYZE",font=("Bahnschrift SemiBold SemiConden",20),text_color="white",
+                                        bg_color="gray10",height=65,width=165,fg_color="#228B22",hover_color="#fce101",command=self.on_start)
+        self.start_analyze.place(x=215,y=10)
+
+        self.stop_analyze = CTkButton(file_handler_box,text="STOP ANALYZE",font=("Bahnschrift SemiBold SemiConden",20),text_color="white",
+                                        bg_color="gray10",height=65,width=165,fg_color="grey50",hover_color="#fce101",command=self.on_stop)
+        self.stop_analyze.place(x=215,y=85)
+        self.stop_analyze.configure(state="disabled")
+
+        # table_1 = CTkLabel(master=self.plot_box.tab("TABLE"),text="helo",height=10,width=10)
+        # table_1.place(x=10,y=10)
+
+        self.table_frame = CTkScrollableFrame(master=self.plot_box.tab("TABLE"),width=700,height=400)
+        self.table_frame.pack(padx=5,pady=5,expand=False)
+
+        # value = pd.read_csv("location_test_csv.csv")
+
+        self.barplot_choice = CTkComboBox(self.plot_box.tab("BARPLOT"),values=["NONE","ID LENGHT DATA"],command=self.barplot_choice)
+        self.barplot_choice.pack()
         
 
+    def back_to_homepage(self):
+        if self.is_start == False:
+            self.controller.show_frame(StartPage)
+        else :
+            # print("masih on goblok")
+            CTkMessagebox(self,title="Warning", icon="warning",message="Please stop analyzing before back to homepage",height=40,width=400)
+            return
+
+
+    def select_csv(self):
+
+        self.filename_var = tk.StringVar()
+
+        filetypes = (('CSV files', '*.csv'), 
+                     ('All files', '*.*'))
+
+        self.name_csv = filedialog.askopenfilename(
+            title='Open a file',
+            initialdir=self.script_dir,
+            filetypes=filetypes
+            )
         
-    
+        self.filename_var.set(os.path.basename(self.name_csv))
+        self.csv_path.configure(text=f"{self.filename_var.get()}")
+        
+
+    def main_analyze(self):
+        self.data = pd.read_csv(self.name_csv)
+        num_row,num_colums = self.data.shape
+        self.table = CTkTable(self.table_frame,values=self.data.values.tolist(),wraplength=100,row=num_row,column=num_colums)
+        self.table.pack()
+        self.main_data()
+
+    def on_start (self):
+        '''
+        This section is place to run the function
+        '''
+
+        self.is_start = True
+
+        self.main_analyze()
+        self.start_analyze.configure(fg_color="grey50",state='disabled')
+        self.stop_analyze.configure(fg_color="#FF0000",state='normal')
+        self.select_button_csv.configure(state='disabled')
+        
+        
+        
+
+
+    def on_stop(self):
+        self.is_start = False
+        self.table.destroy()
+        self.total_pothole_value.configure(text=f'0')
+        self.total_width_mean_value.configure(text=f"0.0")
+        self.total_lenght_mean_value.configure(text=f"0.0")
+        self.start_analyze.configure(fg_color="#228B22",state='normal')
+        self.stop_analyze.configure(fg_color="grey50",state='disabled')
+        self.select_button_csv.configure(state='normal')
+        self.csv_path.configure(text="")
+
+        self.canvas.get_tk_widget().destroy()
+        self.toolbar.destroy()
+
+
+
+    # def table(self):
+    #     self.data = pd.read_csv(self.name_csv)
+
+    #     table_1 = CTkLabel(self.plot_box.tab("TABLE"),text="hello",height=100,y=100)
+    #     table_1.place(x=10,y=10)
+
+    def main_data(self):
+        self.total_rows = self.data.shape[0]
+        self.mean_width = self.data['Width'].mean()
+        self.mean_lenght = self.data['height'].mean()
+        self.total_pothole_value.configure(text=f'{self.total_rows}')
+        self.total_width_mean_value.configure(text=f"{round(self.mean_width,1)}")
+        self.total_lenght_mean_value.configure(text=f"{round(self.mean_lenght,1)}")
+
+    def barplot_choice(self,choice):
+        if choice == "ID LENGHT DATA" :
+            id = self.data['ID']
+            elevation = self.data['Elevation']
+            temperature = self.data['temprature']
+
+
+            fig, ax1 = plt.subplots(figsize=(13, 8))
+            # ax.bar(range(len(id)), elevation, tick_label=id)
+            ax1.plot(id, elevation, marker='o', linestyle='-', label='Elevation')
+            ax1.set_xlabel('ID')
+            ax1.set_ylabel('Elevation', color='tab:blue')
+            ax1.tick_params(axis='y', labelcolor='tab:blue')
+
+            ax2 = ax1.twinx()
+            ax2.plot(id, temperature, marker='s', linestyle='-', color='tab:red', label='Temperature')
+            ax2.set_ylabel('Temperature', color='tab:red')
+            ax2.tick_params(axis='y', labelcolor='tab:red')
+
+            for i, txt in enumerate(id):
+                ax1.annotate(txt, (id[i], elevation[i]), textcoords="offset points", xytext=(0, 10), ha='center')
+
+            for i, txt in enumerate(id):
+                ax2.annotate(txt, (id[i], temperature[i]), textcoords="offset points", xytext=(0, 5), ha='center')
+            # Integrate the navigation toolbar
+            
+            ax1.legend(loc='upper left', bbox_to_anchor=(0.7, 1.0))
+            ax2.legend(loc='upper left', bbox_to_anchor=(0.7, 0.9))
+
+            ax1.grid(True)
+
+            self.canvas = FigureCanvasTkAgg(fig, master=self.plot_box.tab("BARPLOT"))
+            self.canvas.draw()
+
+            self.canvas.get_tk_widget().place(x=20, y=50)
+            self.toolbar = NavigationToolbar2Tk(self.canvas, self.plot_box.tab("BARPLOT"))
+            self.toolbar.update()
+            # Display the navigation self.toolbar
+            self.toolbar.place(x=20, y=600)  # Adjust the position as needed
+
+        elif choice == "NONE" :
+            print("BOO")
 
     
+
 
 
 
 if __name__ == "__main__":
+
     
     script_dir = os.path.dirname(os.path.abspath(__file__))
     app = tkinterApp()
