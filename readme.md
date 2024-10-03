@@ -1,6 +1,10 @@
 ![image](https://github.com/user-attachments/assets/04836622-94b3-4d73-ad3c-c83462d5f897)
 
 # 
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![tensorflow](https://img.shields.io/badge/TensorFlow-FF6F00?style=for-the-badge&logo=tensorflow&logoColor=white)
+
+#
 
 The Pothole Detector is an application designed to identify road potholes by assigning a unique identifier to each pothole, annotating them with coordinates based on their IP address, recording the timestamp of detection, and capturing photographs of each detected pothole. This program is implemented using Python, OpenCV, and YOLOv8.
 ## History 📚✨
