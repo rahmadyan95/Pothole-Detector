@@ -43,5 +43,81 @@ Under development
 
 ## How To Use 
 
+### Detection Feature
+
+![image](https://github.com/user-attachments/assets/53977618-ea0b-4277-9256-86a66c1b61c1)
+
+<ol>
+  <li>Step 1
+    <ul>
+      <li>Input the video to be detected. This is possible with two inputs: either from a video file in the folder or directly via camera input.</li>
+    </ul>
+  </li>
+  <li>Step 2
+    <ul>
+      <li>Select the folder to save the detection results in the directory. The file format will be CSV for data. Check the "Save Crop" option to save images of the potholes.</li>
+    </ul>
+  </li>
+  <li>Step 3
+    <ul>
+      <li>Press the "Start" button to begin detection.</li>
+    </ul>
+  </li>
+  <li>Step 4
+    <ul>
+      <li>Press the "Stop" button to halt detection.</li>
+    </ul>
+  </li>
+</ol>
+
+### Show Data Feature
+
+![image](https://github.com/user-attachments/assets/837b8e54-5bcb-45ab-ab4c-ac190d99e90f)
+
+
+<ol>
+  <li>Step 1
+    <ul>
+      <li>Input the data.</li>
+    </ul>
+  </li>
+  <li>Step 2
+    <ul>
+      <li>Press the "Start" button.</li>
+    </ul>
+  </li>
+  <li>Step 3
+    <ul>
+      <li>Select the desired chart operation such as:
+        <ol type="a">
+          <li>ID WIDTH LENGTH DATA</li>
+          <li>ID TEMP ELEV DATA</li>
+          <li>TIME ELEVATION TEMP DATA</li>
+        </ol>
+      </li>
+    </ul>
+  </li>
+  <li>Step 4
+    <ul>
+      <li>Input the necessary data to generate the PDF report.</li>
+    </ul>
+  </li>
+  <li>Step 5
+    <ul>
+      <li>Press the "Save PDF" button to Save Auto Report PDF.</li>
+    </ul>
+  </li>
+
+  <li>Step 6
+    <ul>
+      <li>Press the "Stop" button to complete the process.</li>
+    </ul>
+  </li>
+</ol>
+
+
+
+
+
 
 
