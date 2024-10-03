@@ -18,7 +18,8 @@ While driving on the highway, I observed road repair workers inspecting potholes
 ### 📷 Detect Road Potholes
 First is to detect road potholes using only a regular webcam with OpenCV Python technology and the application of artificial intelligence in object classification to accurately identify potholes.
 
-![03](https://github.com/user-attachments/assets/eb56b0a1-3a26-4ce5-94e0-1a807c619f5e)
+![image](https://github.com/user-attachments/assets/a0b8ea28-895a-47f1-a054-bd851b6d81b1)
+
 
 ### 🗺️ Show Map
 Show map feature is used to display the locations of potholes detected by the camera. The system will record each pothole detected by the camera, and these locations will be displayed on a map using Geocoder and OpenStreetMap.
@@ -39,5 +40,8 @@ Show data feature is designed to generate data in PDF format. The report, which 
 
 Under development
 ![image](https://github.com/user-attachments/assets/a8ed466c-467f-47e6-813d-986a13a63ef1)
+
+## How To Use 
+
 
 
