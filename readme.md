@@ -13,26 +13,4 @@ The Pothole Detector is an application designed to identify road potholes by ass
 While driving on the highway, I observed road repair workers inspecting potholes. I noticed that their working method seemed less efficient as, for each pothole they encountered, they had to stop their vehicle, capture photographs, and document various details. Perhaps with the existence of this application, it could streamline their work.
 
 ## Main Feature 
-Clone this repository
-
-    git clone https://github.com/rahmadyan95/Pothole-Detector.git
-
-Open this folder
-
-
-
-Make python virtual environment 
-
-    python -m venv env
-
-Activate your virtual environment
-
-    env\Scripts\activate
-
-Install requirements.txt
-    
-    pip install -r requirements.txt
-
-run this program
-
-    python detect.py
+![01](https://github.com/user-attachments/assets/0043aed7-89f9-4010-a377-e9b18b3ea9d6)
